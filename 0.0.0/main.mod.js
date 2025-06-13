@@ -11,6 +11,7 @@ class pdipMod extends PolyMod {
     polyModLoader.registerFuncMixin("FR.prototype", MixinType.INSERT, 'constructor(e, t, n, i, r, a, s, o, l, c, h, d, u, p, f, m, g) {', () => {
       this.trackId = c;
       console.log(c);
+    });
   }
 }
 
