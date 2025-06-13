@@ -442,8 +442,8 @@ class pdipMod extends PolyMod {
         const uiDiv = document.getElementById("ui");
     
         const leftDiv = document.createElement("div");
-        leftDiv.className = "leftDiv"
-        leftDiv.id = "leftDiv"
+        leftDiv.className = "leftDiv";
+        leftDiv.id = "leftDiv";
         leftDiv.style.position = "absolute";
         leftDiv.style.left = "0";
         leftDiv.style.height = "100%";
@@ -459,13 +459,13 @@ class pdipMod extends PolyMod {
         if (!barSetting) {barDiv.style.opacity = "0"};
         
         const bar = document.createElement("div");
-        bar.className = "height-bar"
-        barDiv.className = "height-bar-div"
+        bar.className = "height-bar";
+        barDiv.className = "height-bar-div";
     
         leftDiv.appendChild(barDiv);
         barDiv.appendChild(bar);
     
-        playerArrow = document.createElement("div")
+        playerArrow = document.createElement("div");
         playerArrow.className = "player-arrow";
         playerArrow.style.bottom = "1.5%";
         barDiv.appendChild(playerArrow);
@@ -491,7 +491,7 @@ class pdipMod extends PolyMod {
         textDiv.appendChild(heightText);
         textDiv.appendChild(pbText);
     
-        pbArrow = document.createElement("div")
+        pbArrow = document.createElement("div");
         pbArrow.className = "arrow";
         pbArrow.style.background = "#00b8be";
         pbArrow.style.bottom = `${roundNumber(pb)}%`;
@@ -551,7 +551,7 @@ class pdipMod extends PolyMod {
     
         uiDiv.appendChild(greenTimer);
     
-        timeLength = timer_value
+        timeLength = timer_value;
     
         const timer = document.createElement("p");
         timer.textContent = formatSeconds(timer_value);
@@ -578,14 +578,14 @@ class pdipMod extends PolyMod {
             justify-content: right;
             padding: 0 70px;
         }
-        `
+        `;
     
         document.head.appendChild(timerDivStyle);
     };
 
     const updateHeight = function(value) {
         const heightPercent = roundNumber(value);
-        heightText.textContent = `Height: ${Math.round(value)}m (${heightPercent}%)`
+        heightText.textContent = `Height: ${Math.round(value)}m (${heightPercent}%)`;
         playerArrow.style.bottom = `${heightPercent}%`;    
     };
     
@@ -595,7 +595,7 @@ class pdipMod extends PolyMod {
     };
     
     const createArrow = function(bg_color, height, inner_text, z_index="auto") {
-        const arrow = document.createElement("div")
+        const arrow = document.createElement("div");
         arrow.className = "arrow";
         arrow.style.background = bg_color;
         arrow.style.bottom = height;
