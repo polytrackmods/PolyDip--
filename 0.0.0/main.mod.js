@@ -4,32 +4,215 @@ class pdipMod extends PolyMod {
   init = function(polyModLoader) {
 
     //define variables
-
-    this.trackId = null;
-    this.heightText = null;
-    this.pbText = null;
-    this.barDiv = null;
-    this.pbArrow = null;
-    this.playerArrow = null;
-    this.floorHeights = [35, 105, 245, 365, 500, 645, 770, 885, 1025, 1150, 1295, 1425, 1580, 1720, 1855, 1990, 2110, 2395];
-    this.popupInfo = [["Cold Beginning", "#5DE2E7"],["xddlent", "#FFECA1"],["Summer Slide", "#FFCC00"],["You're Skewed", "#FFFFFF"],["Thawing Temple", "#E75480"],["The Knot", "#7DDA58"],["The Sponge", "#060270"],["Koopa Troopa", "#b9f2ff"],["Strawberry Cheesecake", "#8b0000"],["Ice Gold", "#FE9900"],["Missing Pieces", "#020202"],["Paarse Ramp", "#CC6CE7"],["Iolites Trace", "#FFB6C1"],["Spider Sense", "#013220"],["Scared of Dragons?", "#CECECE"],["On the Edge", "#FD7C79"]];
-    this.greenTimer = null;
-    this.timeLength = 0;
-    this.stopWatch = null;
-    this.playerSimHeight = 35;
-    this.polyDipEnabled = false;
-    this.trackId = null;
+    let heightText;
+    let pbText;
+    let barDiv;
+    let pbArrow;
+    let playerArrow;
+    const floorHeights = [35, 105, 245, 365, 500, 645, 770, 885, 1025, 1150, 1295, 1425, 1580, 1720, 1855, 1990, 2110, 2395];
+    const popupInfo = [["Cold Beginning", "#5DE2E7"],["xddlent", "#FFECA1"],["Summer Slide", "#FFCC00"],["You're Skewed", "#FFFFFF"],["Thawing Temple", "#E75480"],["The Knot", "#7DDA58"],["The Sponge", "#060270"],["Koopa Troopa", "#b9f2ff"],["Strawberry Cheesecake", "#8b0000"],["Ice Gold", "#FE9900"],["Missing Pieces", "#020202"],["Paarse Ramp", "#CC6CE7"],["Iolites Trace", "#FFB6C1"],["Spider Sense", "#013220"],["Scared of Dragons?", "#CECECE"],["On the Edge", "#FD7C79"]];
+    let greenTimer;
+    let timeLength = 0;
+    let stopWatch;
+    let playerSimHeight = 35;
+    let polyDipEnabled = false;
+    let trackId;
+    let trackId = null;
 
       //SETTINGS BOOLS
-    this.barSetting = true;  //Side Bar
-    this.popupSetting = true;   //Floor Number Popup
-    this.timerSetting = true; //Green timer total time
+    let barSetting = true;  //Side Bar
+    let popupSetting = true;   //Floor Number Popup
+    let timerSetting = true; //Green timer total time
 
     //FUNCTIONS
 
-    this.createPolyDipUI = function(pb, player_name, timer_value="0") {
+    const createFloorPopupUI = function(uiDiv) {
+      
+      const topDiv = document.createElement("div");
+      topDiv.className = "popup-div"
+      topDiv.id = "popupDiv"
+  
+      uiDiv.appendChild(topDiv); 
+  
+      const topDivStyle = document.createElement("style");
+      topDivStyle.textContent = `
+      .popup-div {
+          position: absolute;
+          top: 0px;
+          height: 80px;
+          width: 500px;
+          left: calc(50% - 250px);
+          overflow: hidden; 
+          color: white;
+          display: flex;
+          justify-content: center;
+          text-align: center;
+          align-items: center;
+          font-size: 32px;
+      }
+  
+      @keyframes floorSlide1 {
+          0% {
+              transform: translateX(-100%);
+              background: var(--first-color);
+              opacity: 1;
+              z-index: 1;
+          }
+          33.2% {
+              transform: translateX(0%);
+              background: var(--first-color);
+              opacity: 1;
+              z-index: 1;
+          }
+          66.6% {
+              transform: translateX(0%);
+              background: var(--first-color);
+              opacity: 1;
+              z-index: 1;
+          }
+          66.7% {
+              transform: translateX(0%);
+              background: var(--first-color);
+              opacity: 0;
+              z-index: 1;
+          }
+          100% {
+              transform: translateX(-100%);
+              background: var(--first-color);
+              opacity: 0;
+              z-index: 1;
+          }
+      }
+  
+      @keyframes floorSlide2 {
+          0% {
+              transform: translateX(-100%);
+              background: white;
+              opacity: 0;
+              z-index: 2;
+          }
+          33.3% {
+              transform: translateX(-100%);
+              background: white;
+              opacity: 1;
+              z-index: 2;
+          }
+          66.6% {
+              transform: translateX(0%);
+              background: white;
+              opacity: 1;
+              z-index: 2;
+          }
+          99.9% {
+              transform: translateX(100%);
+              background: white;
+              opacity: 1;
+              z-index: 2;
+          }
+          100% {
+              transform: translateX(-100%);
+              opacity: 0;
+              z-index: 2;
+          }
+      }
+  
+      @keyframes bgSlide {
+          0% {
+              opacity: 0;
+          }
+          11% {
+              opacity: 0;
+          }
+          11.1% {
+              background: var(--first-color);
+              opacity: 0.5;
+          }
+          90% {
+              background: var(--first-color);
+              opacity: 0.5;
+          }
+          100% {
+              background: var(--first-color);
+              opacity: 0;
+          }
+      }
+      @keyframes text {
+          0% {
+              opacity: 0;
+          }
+          11% {
+              opacity: 0;
+          }
+          11.1% {
+              opacity: 1;
+          }
+          90% {
+              opacity: 1;
+          }
+          100% {
+              opacity: 0;
+          }
+      }
+  
+      .slide-bar {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          transform: translateX(-100%); 
+      }
+  
+      .slide-bar-anim {
+          animation: floorSlide1 1s forwards;
+      }
+      .slide-bar-anim2 {
+          animation: floorSlide2 1s forwards;
+      }
+      .slide-bg-anim {
+          animation: bgSlide 6s forwards;
+      }
+      .text-anim {
+          animation: text 6s forwards;
+      }
+  
+      .slide-bg {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+      }
+      `;
+  
+      document.head.appendChild(topDivStyle);
+  
+      const bar1 = document.createElement("div");
+      bar1.className = "slide-bar";
+      bar1.id = "slide-bar"
+  
+      topDiv.appendChild(bar1);
+  
+      const bar2 = document.createElement("div");
+      bar2.className = "slide-bar";
+      bar2.id = "slide-bar2";
+  
+      topDiv.appendChild(bar2);
+  
+      const bg = document.createElement("div");
+      bg.className = "slide-bg";
+      bg.id = "slide-bg";
+  
+      topDiv.appendChild(bg);
+  
+      const text = document.createElement("p");
+      text.style.position = "absolute";
+      text.style.zIndex = "1";
+      text.style.opacity = "0";
+      text.id = "slide-text";
+      
+      topDiv.appendChild(text);
+  };
+
+    const createPolyDipUI = function(pb, player_name, timer_value="0") {
     
-        this.polyDipEnabled = true;
+        polyDipEnabled = true;
     
         
         const uiDiv = document.getElementById("ui");
@@ -47,55 +230,55 @@ class pdipMod extends PolyMod {
         createFloorPopupUI(uiDiv);
     
         
-        this.barDiv = document.createElement("div");
+        barDiv = document.createElement("div");
     
-        if (!this.barSetting) {barDiv.style.opacity = "0"};
+        if (!barSetting) {barDiv.style.opacity = "0"};
         
         const bar = document.createElement("div");
         bar.className = "height-bar"
-        this.barDiv.className = "height-bar-div"
+        barDiv.className = "height-bar-div"
     
-        leftDiv.appendChild(this.barDiv);
-        this.barDiv.appendChild(bar);
+        leftDiv.appendChild(barDiv);
+        barDiv.appendChild(bar);
     
-        this.playerArrow = document.createElement("div")
-        this.playerArrow.className = "player-arrow";
-        this.playerArrow.style.bottom = "1.5%";
-        this.barDiv.appendChild(this.playerArrow);
+        playerArrow = document.createElement("div")
+        playerArrow.className = "player-arrow";
+        playerArrow.style.bottom = "1.5%";
+        barDiv.appendChild(playerArrow);
     
         const playerName = document.createElement("p");
         playerName.textContent = player_name;
     
-        this.playerArrow.appendChild(playerName);
+        playerArrow.appendChild(playerName);
     
         const textDiv = document.createElement("div");
         textDiv.className = "pd-text-div";
     
         leftDiv.appendChild(textDiv);
     
-        this.heightText = document.createElement("p");
-        this.heightText.textContent = "Height: 35m (1.5%)";
-        this.heightText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
+        heightText = document.createElement("p");
+        heightText.textContent = "Height: 35m (1.5%)";
+        heightText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
         
-        this.pbText = document.createElement("p");
-        this.pbText.textContent = `PB: ${pb}m`;
-        this.pbText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
+        pbText = document.createElement("p");
+        pbText.textContent = `PB: ${pb}m`;
+        pbText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
     
-        textDiv.appendChild(this.heightText);
-        textDiv.appendChild(this.pbText);
+        textDiv.appendChild(heightText);
+        textDiv.appendChild(pbText);
     
-        this.pbArrow = document.createElement("div")
-        this.pbArrow.className = "arrow";
-        this.pbArrow.style.background = "#00b8be";
-        this.pbArrow.style.bottom = `${roundNumber(pb)}%`;
-        this.pbArrow.style.zIndex = "1";
-        this.barDiv.appendChild(this.pbArrow);
+        pbArrow = document.createElement("div")
+        pbArrow.className = "arrow";
+        pbArrow.style.background = "#00b8be";
+        pbArrow.style.bottom = `${roundNumber(pb)}%`;
+        pbArrow.style.zIndex = "1";
+        barDiv.appendChild(pbArrow);
     
         const pbinnerText = document.createElement("p");
         pbinnerText.textContent = "PB";
         pbinnerText.style.transform = "translateX(-5px)";
     
-        this.pbArrow.appendChild(pbinnerText);
+        pbArrow.appendChild(pbinnerText);
     
         const barStyle = document.createElement('style');
         barStyle.textContent = `
@@ -136,22 +319,22 @@ class pdipMod extends PolyMod {
     
         createFloorMarkers();
     
-        this.greenTimer = document.createElement("div");
-        this.greenTimer.className = "green-timer";
-        this.greenTimer.id = "green-timer";
+        greenTimer = document.createElement("div");
+        greenTimer.className = "green-timer";
+        greenTimer.id = "green-timer";
     
-        if (!this.timerSetting) {this.greenTimer.style.opacity = "0"};
+        if (!timerSetting) {greenTimer.style.opacity = "0"};
     
-        uiDiv.appendChild(this.greenTimer);
+        uiDiv.appendChild(greenTimer);
     
-        this.timeLength = timer_value
+        timeLength = timer_value
     
         const timer = document.createElement("p");
         timer.textContent = formatSeconds(timer_value);
     
-        this.stopWatch = new Stopwatch(timer);
+        stopWatch = new Stopwatch(timer);
     
-        this.greenTimer.appendChild(timer);   
+        greenTimer.appendChild(timer);   
     
         const timerDivStyle = document.createElement("style");
         timerDivStyle.textContent = `
@@ -181,13 +364,13 @@ class pdipMod extends PolyMod {
 
     //keep track of what trackid the current track is (check if the track is polydip)
     polyModLoader.registerClassWideMixin("FR.prototype", MixinType.INSERT, "var v;", () => {
-      this.trackId = c;
+      trackId = c;
       console.log(c);
     });
 
     //main ui from here
     polyModLoader.registerClassWideMixin("pk.prototype", MixinType.INSERT, 'uk(this, Xx, "f").appendChild(uk(this, Zx, "f"))', () => {
-      if (trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50") {this.createPolyDipUI("690", "DoraChad", 33)};
+      if (trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50") {createPolyDipUI("690", "DoraChad", 33)};
     });
   }
 }
