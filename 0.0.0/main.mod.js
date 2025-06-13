@@ -17,7 +17,6 @@ class pdipMod extends PolyMod {
     let playerSimHeight = 35;
     let polyDipEnabled = false;
     let trackId;
-    let trackId = null;
 
       //SETTINGS BOOLS
     let barSetting = true;  //Side Bar
