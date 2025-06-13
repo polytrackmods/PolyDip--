@@ -186,7 +186,7 @@ class pdipMod extends PolyMod {
     });
 
     //main ui from here
-    polyModLoader.registerClassWideMixin("pk.prototype", MixinType.INSERT, "uk(this, Xx, "f").appendChild(uk(this, Zx, "f"))", () => {
+    polyModLoader.registerClassWideMixin("pk.prototype", MixinType.INSERT, 'uk(this, Xx, "f").appendChild(uk(this, Zx, "f"))', () => {
       if (trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50") {this.createPolyDipUI("690", "DoraChad", 33)};
     });
   }
