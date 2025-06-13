@@ -8,7 +8,7 @@ class pdipMod extends PolyMod {
     this.trackId;
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerFuncMixin("FR.prototype", MixinType.INSERT, 'constructor(e, t, n, i, r, a, s, o, l, c, h, d, u, p, f, m, g) {', () => {
+    polyModLoader.registerClassWideMixin("FR.prototype", MixinType.INSERT, "var v;", () => {
       this.trackId = c;
       console.log(c);
     });
