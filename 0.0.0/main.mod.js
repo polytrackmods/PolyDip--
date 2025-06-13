@@ -612,13 +612,13 @@ class pdipMod extends PolyMod {
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerClassWideMixin("FR.prototype", MixinType.INSERT, "var v;", () => {
+    polyModLoader.registerClassWideMixin("FR", MixinType.INSERT, "var v;", () => {
       trackId = c;
       console.log(c);
     });
 
     //main ui from here
-    polyModLoader.registerClassWideMixin("pk.prototype", MixinType.INSERT, 'uk(this, Xx, "f").appendChild(uk(this, Zx, "f"))', () => {
+    polyModLoader.registerClassWideMixin("pk", MixinType.INSERT, 'uk(this, Xx, "f").appendChild(uk(this, Zx, "f"))', () => {
       if (trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50") {createPolyDipUI("690", "DoraChad", 33)};
     });
   }
