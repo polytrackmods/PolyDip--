@@ -24,6 +24,231 @@ class pdipMod extends PolyMod {
     let timerSetting = true; //Green timer total time
 
     //FUNCTIONS
+    const fadeOut = document.createElement("style");
+    fadeOut.textContent = `
+       @keyframes fade {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    
+        .fade-text {
+            animation: fade 1s forwards;
+        }
+    `
+    document.head.appendChild(fadeOut);
+    
+    const rainbowPB = function(height) {
+        const pbText = `NEW PB ${height} m`
+        const uicont = document.getElementById("ui");
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.top = "25%";
+        container.style.left = "calc(50% - 275px)";
+        container.style.fontSize = "80px";
+        container.style.fontWeight = "bold";
+        container.style.width = "550px";
+        container.style.gap = "2px";
+        container.style.letterSpacing = "2px";
+        uicont.appendChild(container);
+    
+        const letters = pbText.split("").map((char, i) => {
+            const span = document.createElement("span");
+            span.textContent = char === " " ? "\u00A0" : char;
+            span.style.display = "inline-block";
+            container.appendChild(span);
+            return span;
+        });
+    
+        let t = 0;
+    let animationId;
+    
+    function animate() {
+      t += 0.1;
+      letters.forEach((letter, i) => {
+        const offset = Math.sin(t + i * 0.3) * 20;
+        letter.style.transform = `translateY(${offset}px)`;
+    
+        const hue = (t * 40 + i * 20) % 360;
+        letter.style.color = `hsl(${hue}, 100%, 50%)`;
+      });
+    
+      animationId = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    // 7 sec
+    setTimeout(() => {
+        container.classList.add("fade-text")
+    }, 6500);
+    
+    setTimeout(() => {
+        cancelAnimationFrame(animationId);
+        container.remove()
+    }, 8000);
+    }
+    
+    
+    const hideUI = function(id) {
+        document.getElementById(id).style.opacity = "0";
+    }
+    const showUI = function(id, opacity="1") {
+        document.getElementById(id).style.opacity = opacity;
+    }
+    
+    class Stopwatch {
+        constructor(q) {
+            this.interval = null;
+            this.ui = q;
+            this.running = false;
+        }
+    
+        start() {
+            if (this.running) return;
+            this.running = true;
+            
+            this.interval = setInterval(() => {
+                timeLength++;
+                this.ui.textContent = formatSeconds(timeLength);
+            }, 1000);
+        }
+    
+        stop() {
+            clearInterval(this.interval);
+            this.running = false;
+        }
+        clear() {
+            timeLength = 0;
+        }
+    }
+    
+    function formatSeconds(seconds) {
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+    
+        if (d > 0) return `${d}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (m > 0) return `${m}:${String(s).padStart(2, '0')}`;
+        return `${s}`;
+    };
+    
+    
+    const addPlayer = function(player_id, player_name, player_height="36") {
+        const arrow = document.createElement("div")
+        arrow.className = "player-arrow";
+        arrow.id = player_id;
+        arrow.style.bottom = `${roundNumber(player_height)}%`;
+        barDiv.appendChild(arrow);
+    
+        const playerName = document.createElement("p");
+        playerName.textContent = player_name;
+    
+        arrow.appendChild(playerName); 
+    };
+    
+    const editPlayer = function(player_id, player_height) {
+        const arrow = document.getElementById(`${player_id}`);
+        arrow.style.bottom = `${roundNumber(player_height)}%`;
+    }
+    
+    const removePlayer = function(player_id) {
+        const arrow = document.getElementById(`${player_id}`);
+        arrow.remove();
+    }
+    
+    const floorPopup = function(floor_num) {
+        if (popupSetting) {
+            const color = popupInfo[floor_num - 1][1]
+            const desc = popupInfo[floor_num -1][0]
+            
+            const bar = document.getElementById("slide-bar");
+            const bar2 = document.getElementById("slide-bar2");
+            const bg = document.getElementById("slide-bg");
+            const text = document.getElementById("slide-text");
+        
+            bar.classList.remove("slide-bar-anim"); 
+            bar2.classList.remove("slide-bar-anim2"); 
+            bg.classList.remove("slide-bg-anim");
+            text.classList.remove("text-anim");     
+        
+            void bar.offsetWidth;
+            void bar2.offsetWidth;
+            void bg.offsetWidth;
+            void text.offsetWidth;
+            
+            bar.style.setProperty("--first-color", color);
+            bar.classList.add("slide-bar-anim"); 
+        
+            bar2.classList.add("slide-bar-anim2");
+        
+            bg.style.setProperty("--first-color", color);
+            bg.classList.add("slide-bg-anim");
+        
+            text.innerHTML = `Floor${String(floor_num).padStart(2, '0')}<br>- ${desc} -`;
+            text.classList.add("text-anim");   
+        };
+    }
+
+    const arrowStyle = document.createElement("style");
+    arrowStyle.textContent = `
+    .arrow {
+        background: #192042;
+        width: 50px;
+        height: 30px;
+        margin: 5px 0;
+        position: absolute;
+        bottom: 0%;
+        clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px 0px 2px black;
+    }`;
+    
+    const playerArrowStyle = document.createElement("style");
+    playerArrowStyle.textContent = `
+    .player-arrow {
+        display: flex;
+        bottom: 0%;
+        margin: 5px 60px;
+        clip-path: polygon(100% 0%, 20px 0%, 0% 50%, 20px 100%, 100% 100%);
+        color: white;
+        align-items: center;
+        justify-content: center;
+        padding: 0 25px 0 40px;
+        background: #192042;
+        height: 30px;
+        position: absolute;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px 0px 2px black;
+    }
+    `;
+    
+    document.head.appendChild(playerArrowStyle);
+    document.head.appendChild(arrowStyle);
+
+    
+    const roundNumber = function(value) {
+      return (Math.round((value / 2395) * 1000) / 10).toFixed(1)
+    }
+    
+    const createFloorMarkers = function() {
+      floorHeights.forEach((height, i) => {
+          const isLast = i === floorHeights.length - 1;
+      
+          if (isLast) {
+              createArrow("gold", `${roundNumber(height)}%`, `Fin`);
+          } else {
+              createArrow("gray", `${roundNumber(height)}%`, `${i}`);
+          }
+      });
+    };
 
     const createFloorPopupUI = function(uiDiv) {
       
@@ -358,6 +583,31 @@ class pdipMod extends PolyMod {
         document.head.appendChild(timerDivStyle);
     };
 
+    const updateHeight = function(value) {
+        const heightPercent = roundNumber(value);
+        heightText.textContent = `Height: ${Math.round(value)}m (${heightPercent}%)`
+        playerArrow.style.bottom = `${heightPercent}%`;    
+    };
+    
+    const updatePbHeight = function(value) {
+        pbText.textContent = `PB: ${Math.round(value)}m`;
+        pbArrow.style.bottom = `${roundNumber(value)}%`;
+    };
+    
+    const createArrow = function(bg_color, height, inner_text, z_index="auto") {
+        const arrow = document.createElement("div")
+        arrow.className = "arrow";
+        arrow.style.background = bg_color;
+        arrow.style.bottom = height;
+        arrow.style.zIndex = z_index;
+        barDiv.appendChild(arrow);
+    
+        const innerText = document.createElement("p");
+        innerText.textContent = inner_text;
+        innerText.style.transform = "translateX(-5px)";
+    
+        arrow.appendChild(innerText);
+    };
 
     //MIXINS
 
