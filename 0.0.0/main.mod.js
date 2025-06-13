@@ -612,9 +612,9 @@ class pdipMod extends PolyMod {
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerClassWideMixin("FR", MixinType.CLASSINSERT, "var v;", () => {
-      ActivePolyModLoader.getMod("pdip").trackId = c;
-      console.log(c);
+    polyModLoader.registerClassWideMixin("AR", MixinType.CLASSINSERT, "GI.add(this),", () => {
+      ActivePolyModLoader.getMod("pdip").trackId = t;
+      console.log(t);
     });
 
     //main ui from here
