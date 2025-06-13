@@ -5,7 +5,7 @@ class pdipMod extends PolyMod {
 
     //define variables
 
-    this.trackId;
+    this.trackId = null;
 
     //keep track of what trackid the current track is (check if the track is polydip)
     polyModLoader.registerClassWideMixin("FR.prototype", MixinType.INSERT, "var v;", () => {
