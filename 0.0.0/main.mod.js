@@ -11,7 +11,7 @@ class Stopwatch {
             this.ui = q;
         }
         start() {
-            console.log("startnig")
+            console.log("starting")
             if (this.running) return;
             this.running = true;
             
@@ -495,6 +495,7 @@ class pdipMod extends PolyMod {
     this.polyDipEnabled = false;
     this.trackId;
     this.playerName = "Anonymous";
+    this.playerInfoClass;
 
       //SETTINGS BOOLS
 
@@ -631,6 +632,8 @@ class pdipMod extends PolyMod {
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
         if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", ActivePolyModLoader.getMod("pdip").playerName, 0);};
     `);
+
+    polyModLoader.registerClassMixin("mL.prototype", MixinType.INSERT, 'getCurrentUserProfile() {', 'ActivePolyModLoader.getMod("pdip").playerInfoClass = fL(this, hL, "f").nickname;')
 
     this.car = null;
     this.spectator = null;
