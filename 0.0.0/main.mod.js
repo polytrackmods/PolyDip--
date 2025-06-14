@@ -1,119 +1,23 @@
 import { PolyMod, MixinType } from "https://pml.orangy.cfd/PolyTrackMods/PolyModLoader/0.5.0/PolyModLoader.js";
 
-class pdipMod extends PolyMod {  
-  init = function(polyModLoader) {
 
-    //define variables
-    let heightText;
-    let pbText;
-    let barDiv;
-    let pbArrow;
-    let playerArrow;
-    const floorHeights = [35, 105, 245, 365, 500, 645, 770, 885, 1025, 1150, 1295, 1425, 1580, 1720, 1855, 1990, 2110, 2395];
-    const popupInfo = [["Cold Beginning", "#5DE2E7"],["xddlent", "#FFECA1"],["Summer Slide", "#FFCC00"],["You're Skewed", "#FFFFFF"],["Thawing Temple", "#E75480"],["The Knot", "#7DDA58"],["The Sponge", "#060270"],["Koopa Troopa", "#b9f2ff"],["Strawberry Cheesecake", "#8b0000"],["Ice Gold", "#FE9900"],["Missing Pieces", "#020202"],["Paarse Ramp", "#CC6CE7"],["Iolites Trace", "#FFB6C1"],["Spider Sense", "#013220"],["Scared of Dragons?", "#CECECE"],["On the Edge", "#FD7C79"]];
-    let greenTimer;
-    let timeLength = 0;
-    let stopWatch;
-    let playerSimHeight = 35;
-    let polyDipEnabled = false;
-    let trackId;
-
-      //SETTINGS BOOLS
-    let barSetting = true;  //Side Bar
-    let popupSetting = true;   //Floor Number Popup
-    let timerSetting = true; //Green timer total time
-
-    //FUNCTIONS
-    const fadeOut = document.createElement("style");
-    fadeOut.textContent = `
-       @keyframes fade {
-            0% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-    
-        .fade-text {
-            animation: fade 1s forwards;
-        }
-    `
-    document.head.appendChild(fadeOut);
-    
-    const rainbowPB = function(height) {
-        const pbText = `NEW PB ${height} m`
-        const uicont = document.getElementById("ui");
-        const container = document.createElement("div");
-        container.style.position = "absolute";
-        container.style.top = "25%";
-        container.style.left = "calc(50% - 275px)";
-        container.style.fontSize = "80px";
-        container.style.fontWeight = "bold";
-        container.style.width = "550px";
-        container.style.gap = "2px";
-        container.style.letterSpacing = "2px";
-        uicont.appendChild(container);
-    
-        const letters = pbText.split("").map((char, i) => {
-            const span = document.createElement("span");
-            span.textContent = char === " " ? "\u00A0" : char;
-            span.style.display = "inline-block";
-            container.appendChild(span);
-            return span;
-        });
-    
-        let t = 0;
-    let animationId;
-    
-    function animate() {
-      t += 0.1;
-      letters.forEach((letter, i) => {
-        const offset = Math.sin(t + i * 0.3) * 20;
-        letter.style.transform = `translateY(${offset}px)`;
-    
-        const hue = (t * 40 + i * 20) % 360;
-        letter.style.color = `hsl(${hue}, 100%, 50%)`;
-      });
-    
-      animationId = requestAnimationFrame(animate);
-    }
-    
-    animate();
-    
-    // 7 sec
-    setTimeout(() => {
-        container.classList.add("fade-text")
-    }, 6500);
-    
-    setTimeout(() => {
-        cancelAnimationFrame(animationId);
-        container.remove()
-    }, 8000);
-    }
-    
-    
-    const hideUI = function(id) {
-        document.getElementById(id).style.opacity = "0";
-    }
-    const showUI = function(id, opacity="1") {
-        document.getElementById(id).style.opacity = opacity;
-    }
-    
-    class Stopwatch {
-        constructor(q) {
+let timeLength = 0;
+class Stopwatch {
+        constructor() {
             this.interval = null;
-            this.ui = q;
             this.running = false;
         }
-    
+        setTimer(q) {
+            this.ui = q;
+        }
         start() {
+            console.log("startnig")
             if (this.running) return;
             this.running = true;
             
             this.interval = setInterval(() => {
                 timeLength++;
-                this.ui.textContent = formatSeconds(timeLength);
+                this.ui ? this.ui.textContent = polyMod.formatSeconds(timeLength) : null;
             }, 1000);
         }
     
@@ -122,29 +26,19 @@ class pdipMod extends PolyMod {
             this.running = false;
         }
         clear() {
+            this.stop();
+            this.ui ? this.ui.textContent = polyMod.formatSeconds(timeLength) : null;
             timeLength = 0;
         }
     }
-    
-    function formatSeconds(seconds) {
-        const d = Math.floor(seconds / 86400);
-        const h = Math.floor((seconds % 86400) / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
-    
-        if (d > 0) return `${d}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-        if (m > 0) return `${m}:${String(s).padStart(2, '0')}`;
-        return `${s}`;
-    };
-    
-    
-    const addPlayer = function(player_id, player_name, player_height="36") {
+
+class pdipMod extends PolyMod { 
+    addPlayer = function(player_id, player_name, player_height="36") {
         const arrow = document.createElement("div")
         arrow.className = "player-arrow";
         arrow.id = player_id;
-        arrow.style.bottom = `${roundNumber(player_height)}%`;
-        barDiv.appendChild(arrow);
+        arrow.style.bottom = `${this.roundNumber(player_height)}%`;
+        this.barDiv.appendChild(arrow);
     
         const playerName = document.createElement("p");
         playerName.textContent = player_name;
@@ -152,18 +46,18 @@ class pdipMod extends PolyMod {
         arrow.appendChild(playerName); 
     };
     
-    const editPlayer = function(player_id, player_height) {
+    editPlayer = function(player_id, player_height) {
         const arrow = document.getElementById(`${player_id}`);
-        arrow.style.bottom = `${roundNumber(player_height)}%`;
+        arrow.style.bottom = `${this.roundNumber(player_height)}%`;
     }
     
-    const removePlayer = function(player_id) {
+    removePlayer = function(player_id) {
         const arrow = document.getElementById(`${player_id}`);
         arrow.remove();
     }
     
-    const floorPopup = function(floor_num) {
-        if (popupSetting) {
+    floorPopup = function(floor_num) {
+        if (this.pml.getSetting("popupSetting") === "true") {
             const color = popupInfo[floor_num - 1][1]
             const desc = popupInfo[floor_num -1][0]
             
@@ -195,62 +89,23 @@ class pdipMod extends PolyMod {
         };
     }
 
-    const arrowStyle = document.createElement("style");
-    arrowStyle.textContent = `
-    .arrow {
-        background: #192042;
-        width: 50px;
-        height: 30px;
-        margin: 5px 0;
-        position: absolute;
-        bottom: 0%;
-        clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px 0px 2px black;
-    }`;
-    
-    const playerArrowStyle = document.createElement("style");
-    playerArrowStyle.textContent = `
-    .player-arrow {
-        display: flex;
-        bottom: 0%;
-        margin: 5px 60px;
-        clip-path: polygon(100% 0%, 20px 0%, 0% 50%, 20px 100%, 100% 100%);
-        color: white;
-        align-items: center;
-        justify-content: center;
-        padding: 0 25px 0 40px;
-        background: #192042;
-        height: 30px;
-        position: absolute;
-        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px 0px 2px black;
-    }
-    `;
-    
-    document.head.appendChild(playerArrowStyle);
-    document.head.appendChild(arrowStyle);
-
-    
-    const roundNumber = function(value) {
+    roundNumber = function(value) {
       return (Math.round((value / 2395) * 1000) / 10).toFixed(1)
     }
     
-    const createFloorMarkers = function() {
-      floorHeights.forEach((height, i) => {
-          const isLast = i === floorHeights.length - 1;
+    createFloorMarkers = function() {
+      this.floorHeights.forEach((height, i) => {
+          const isLast = i === this.floorHeights.length - 1;
       
           if (isLast) {
-              createArrow("gold", `${roundNumber(height)}%`, `Fin`);
+              this.createArrow("gold", `${this.roundNumber(height)}%`, `Fin`);
           } else {
-              createArrow("gray", `${roundNumber(height)}%`, `${i}`);
+              this.createArrow("gray", `${this.roundNumber(height)}%`, `${i}`);
           }
       });
     };
 
-    const createFloorPopupUI = function(uiDiv) {
+    createFloorPopupUI = function(uiDiv) {
       
       const topDiv = document.createElement("div");
       topDiv.className = "popup-div"
@@ -434,9 +289,9 @@ class pdipMod extends PolyMod {
       topDiv.appendChild(text);
   };
 
-    const createPolyDipUI = function(pb, player_name, timer_value="0") {
+    createPolyDipUI = function(pb, player_name, timer_value="0") {
     
-        polyDipEnabled = true;
+        this.polyDipEnabled = true;
     
         
         const uiDiv = document.getElementById("ui");
@@ -451,52 +306,52 @@ class pdipMod extends PolyMod {
         uiDiv.appendChild(leftDiv);
     
         
-        createFloorPopupUI(uiDiv);
+        this.createFloorPopupUI(uiDiv);
     
         
-        barDiv = document.createElement("div");
+        this.barDiv = document.createElement("div");
     
-        if (!barSetting) {barDiv.style.opacity = "0"};
+        if (!this.pml.getSetting("barSetting") === "true") {this.barDiv.style.opacity = "0"};
         
         const bar = document.createElement("div");
         bar.className = "height-bar";
-        barDiv.className = "height-bar-div";
+        this.barDiv.className = "height-bar-div";
     
-        leftDiv.appendChild(barDiv);
-        barDiv.appendChild(bar);
+        leftDiv.appendChild(this.barDiv);
+        this.barDiv.appendChild(bar);
     
-        playerArrow = document.createElement("div");
-        playerArrow.className = "player-arrow";
-        playerArrow.style.bottom = "1.5%";
-        barDiv.appendChild(playerArrow);
+        this.playerArrow = document.createElement("div");
+        this.playerArrow.className = "player-arrow";
+        this.playerArrow.style.bottom = "1.5%";
+        this.barDiv.appendChild(this.playerArrow);
     
         const playerName = document.createElement("p");
         playerName.textContent = player_name;
     
-        playerArrow.appendChild(playerName);
+        this.playerArrow.appendChild(playerName);
     
         const textDiv = document.createElement("div");
         textDiv.className = "pd-text-div";
     
         leftDiv.appendChild(textDiv);
     
-        heightText = document.createElement("p");
-        heightText.textContent = "Height: 35m (1.5%)";
-        heightText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
+        this.heightText = document.createElement("p");
+        this.heightText.textContent = "Height: 35m (1.5%)";
+        this.heightText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
         
-        pbText = document.createElement("p");
-        pbText.textContent = `PB: ${pb}m`;
-        pbText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
+        this.pbText = document.createElement("p");
+        this.pbText.textContent = `PB: ${pb}m`;
+        this.pbText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
     
-        textDiv.appendChild(heightText);
-        textDiv.appendChild(pbText);
+        textDiv.appendChild(this.heightText);
+        textDiv.appendChild(this.pbText);
     
-        pbArrow = document.createElement("div");
+        let pbArrow = document.createElement("div");
         pbArrow.className = "arrow";
         pbArrow.style.background = "#00b8be";
-        pbArrow.style.bottom = `${roundNumber(pb)}%`;
+        pbArrow.style.bottom = `${this.roundNumber(pb)}%`;
         pbArrow.style.zIndex = "1";
-        barDiv.appendChild(pbArrow);
+        this.barDiv.appendChild(pbArrow);
     
         const pbinnerText = document.createElement("p");
         pbinnerText.textContent = "PB";
@@ -541,24 +396,21 @@ class pdipMod extends PolyMod {
         document.head.appendChild(barDivStyle);
         document.head.appendChild(textDivStyle);
     
-        createFloorMarkers();
+        this.createFloorMarkers();
     
-        greenTimer = document.createElement("div");
-        greenTimer.className = "green-timer";
-        greenTimer.id = "green-timer";
+        this.greenTimer = document.createElement("div");
+        this.greenTimer.className = "green-timer";
+        this.greenTimer.id = "green-timer";
     
-        if (!timerSetting) {greenTimer.style.opacity = "0"};
+        if (!this.pml.getSetting("timerSetting") === "true") {this.greenTimer.style.opacity = "0"};
     
-        uiDiv.appendChild(greenTimer);
-    
-        timeLength = timer_value;
-    
+        uiDiv.appendChild(this.greenTimer);
+
         const timer = document.createElement("p");
-        timer.textContent = formatSeconds(timer_value);
-    
-        stopWatch = new Stopwatch(timer);
-    
-        greenTimer.appendChild(timer);   
+        timer.textContent = this.formatSeconds(timer_value);
+        this.stopWatch.setTimer(timer);
+
+        this.greenTimer.appendChild(timer);   
     
         const timerDivStyle = document.createElement("style");
         timerDivStyle.textContent = `
@@ -583,24 +435,24 @@ class pdipMod extends PolyMod {
         document.head.appendChild(timerDivStyle);
     };
 
-    const updateHeight = function(value) {
-        const heightPercent = roundNumber(value);
-        heightText.textContent = `Height: ${Math.round(value)}m (${heightPercent}%)`;
-        playerArrow.style.bottom = `${heightPercent}%`;    
+    updateHeight = function(value) {
+        const heightPercent = this.roundNumber(value);
+        this.heightText.textContent = `Height: ${Math.round(value)}m (${heightPercent}%)`;
+        this.playerArrow.style.bottom = `${heightPercent}%`;    
     };
     
-    const updatePbHeight = function(value) {
-        pbText.textContent = `PB: ${Math.round(value)}m`;
-        pbArrow.style.bottom = `${roundNumber(value)}%`;
+    updatePbHeight = function(value) {
+        this.pbText.textContent = `PB: ${Math.round(value)}m`;
+        this.pbArrow.style.bottom = `${this.roundNumber(value)}%`;
     };
     
-    const createArrow = function(bg_color, height, inner_text, z_index="auto") {
+    createArrow = function(bg_color, height, inner_text, z_index="auto") {
         const arrow = document.createElement("div");
         arrow.className = "arrow";
         arrow.style.background = bg_color;
         arrow.style.bottom = height;
         arrow.style.zIndex = z_index;
-        barDiv.appendChild(arrow);
+        this.barDiv.appendChild(arrow);
     
         const innerText = document.createElement("p");
         innerText.textContent = inner_text;
@@ -608,20 +460,190 @@ class pdipMod extends PolyMod {
     
         arrow.appendChild(innerText);
     };
+    formatSeconds(seconds) {
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+    
+        if (d > 0) return `${d}:${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        if (m > 0) return `${m}:${String(s).padStart(2, '0')}`;
+        return `${s}`;
+    };
+    removePolyDipUI = function() {
+        const leftDiv = document.getElementById("leftDiv");
+        leftDiv.remove();
+        const topDiv = document.getElementById("popupDiv");
+        topDiv.remove();
+        const timerGr = document.getElementById("green-timer");
+        timerGr.remove();
+    };
+  init = function(polyModLoader) {
+    this.pml = polyModLoader;
+    //define variables
+    this.heightText;
+    this.pbText;
+    this.barDiv;
+    this.pbArrow;
+    this.playerArrow;
+    this.floorHeights = [35, 105, 245, 365, 500, 645, 770, 885, 1025, 1150, 1295, 1425, 1580, 1720, 1855, 1990, 2110, 2395];
+    this.popupInfo = [["Cold Beginning", "#5DE2E7"],["xddlent", "#FFECA1"],["Summer Slide", "#FFCC00"],["You're Skewed", "#FFFFFF"],["Thawing Temple", "#E75480"],["The Knot", "#7DDA58"],["The Sponge", "#060270"],["Koopa Troopa", "#b9f2ff"],["Strawberry Cheesecake", "#8b0000"],["Ice Gold", "#FE9900"],["Missing Pieces", "#020202"],["Paarse Ramp", "#CC6CE7"],["Iolites Trace", "#FFB6C1"],["Spider Sense", "#013220"],["Scared of Dragons?", "#CECECE"],["On the Edge", "#FD7C79"]];
+    this.greenTimer;
+    this.stopWatch = new Stopwatch();
+    this.playerSimHeight = 35;
+    this.polyDipEnabled = false;
+    this.trackId;
+
+      //SETTINGS BOOLS
+
+    polyModLoader.registerSettingCategory("PolyDip Mod");
+    polyModLoader.registerSetting("Show Side Bar", "barSetting", "boolean", true);
+    polyModLoader.registerSetting("Show Floor Number Popup", "popupSetting", "boolean", true);
+    polyModLoader.registerSetting("Green timer", "timerSetting", "boolean", true);
+
+    polyModLoader.registerBindCategory("PolyDip Mod Green Timer");
+    polyModLoader.registerKeybind("Start/stop timer", "pDipStartTimer", "keydown","KeyU", null, (e) => {if(this.polyDipEnabled) {e.preventDefault();this.stopWatch.running ? this.stopWatch.stop() : this.stopWatch.start()}})
+    polyModLoader.registerKeybind("Reset timer", "pDipResetTimer", "keydown","Digit0", null, (e) => {if(this.polyDipEnabled) {e.preventDefault();this.stopWatch.clear();}})
+
+    //FUNCTIONS
+    const fadeOut = document.createElement("style");
+    fadeOut.textContent = `
+       @keyframes fade {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    
+        .fade-text {
+            animation: fade 1s forwards;
+        }
+    `
+    document.head.appendChild(fadeOut);
+    
+    const rainbowPB = function(height) {
+        const pbText = `NEW PB ${height} m`
+        const uicont = document.getElementById("ui");
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.top = "25%";
+        container.style.left = "calc(50% - 275px)";
+        container.style.fontSize = "80px";
+        container.style.fontWeight = "bold";
+        container.style.width = "550px";
+        container.style.gap = "2px";
+        container.style.letterSpacing = "2px";
+        uicont.appendChild(container);
+    
+        const letters = pbText.split("").map((char, i) => {
+            const span = document.createElement("span");
+            span.textContent = char === " " ? "\u00A0" : char;
+            span.style.display = "inline-block";
+            container.appendChild(span);
+            return span;
+        });
+    
+        let t = 0;
+    let animationId;
+    
+    function animate() {
+      t += 0.1;
+      letters.forEach((letter, i) => {
+        const offset = Math.sin(t + i * 0.3) * 20;
+        letter.style.transform = `translateY(${offset}px)`;
+    
+        const hue = (t * 40 + i * 20) % 360;
+        letter.style.color = `hsl(${hue}, 100%, 50%)`;
+      });
+    
+      animationId = requestAnimationFrame(animate);
+    }
+    
+    animate();
+    
+    // 7 sec
+    setTimeout(() => {
+        container.classList.add("fade-text")
+    }, 6500);
+    
+    setTimeout(() => {
+        cancelAnimationFrame(animationId);
+        container.remove()
+    }, 8000);
+    }
+    
+    
+    const hideUI = function(id) {
+        document.getElementById(id).style.opacity = "0";
+    }
+    const showUI = function(id, opacity="1") {
+        document.getElementById(id).style.opacity = opacity;
+    }
+
+    const arrowStyle = document.createElement("style");
+    arrowStyle.textContent = `
+    .arrow {
+        background: #192042;
+        width: 50px;
+        height: 30px;
+        margin: 5px 0;
+        position: absolute;
+        bottom: 0%;
+        clip-path: polygon(0% 0%, calc(100% - 20px) 0%, 100% 50%, calc(100% - 20px) 100%, 0% 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px 0px 2px black;
+    }`;
+    
+    const playerArrowStyle = document.createElement("style");
+    playerArrowStyle.textContent = `
+    .player-arrow {
+        display: flex;
+        bottom: 0%;
+        margin: 5px 60px;
+        clip-path: polygon(100% 0%, 20px 0%, 0% 50%, 20px 100%, 100% 100%);
+        color: white;
+        align-items: center;
+        justify-content: center;
+        padding: 0 25px 0 40px;
+        background: #192042;
+        height: 30px;
+        position: absolute;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black, 0px 0px 2px black;
+    }
+    `;
+    
+    document.head.appendChild(playerArrowStyle);
+    document.head.appendChild(arrowStyle);
 
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerClassWideMixin("FR", MixinType.CLASSINSERT, "var v;", () => {
-      ActivePolyModLoader.getMod("pdip").trackId = c;
-      console.log(c);
-    });
+    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("pdip").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));`)
 
     //main ui from here
-    polyModLoader.registerClassWideMixin("pk", MixinType.CLASSINSERT, 'uk(this, Xx, "f").appendChild(uk(this, Zx, "f"))', () => {
-      if (ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50") {createPolyDipUI("690", "DoraChad", 33)};
-    });
-  }
+    polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
+        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", "DoraChad", 0);};
+    `);
+
+    this.car = null;
+    this.spectator = null;
+    polyModLoader.registerFuncMixin("pP", MixinType.INSERT, `yP(this, eP, "f").setColors(n.carColors),`, `ActivePolyModLoader.getMod("${this.modID}").car = yP(this, eP, "f"),`)
+    polyModLoader.registerClassMixin("s_.prototype", "addToggleListener", MixinType.INSERT, `a_(this, QT, "f").push(e)`, `,ActivePolyModLoader.getMod("${this.modID}").spectator = this;`);
+    polyModLoader.registerFuncMixin("polyInitFunction", MixinType.INSERT, `y.setAnimationLoop((function(e) {`, `ActivePolyModLoader.getMod("pdip").update();`)
+    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("pdip").removePolyDipUI();`)
+
+    }
+    update = function() {
+        if(this.car) {
+            this.updateHeight(this.car ? this.car.getPosition().y : 35);
+        }
+    }
 }
 
 export let polyMod = new pdipMod();
