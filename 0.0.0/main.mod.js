@@ -494,6 +494,7 @@ class pdipMod extends PolyMod {
     this.playerSimHeight = 35;
     this.polyDipEnabled = false;
     this.trackId;
+    this.playerName;
 
       //SETTINGS BOOLS
 
@@ -624,11 +625,11 @@ class pdipMod extends PolyMod {
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("pdip").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));`)
+    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("${this.modID}").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));ActivePolyModLoader.getMod("${this.modID}").playerName = JSON.parse(localStorage.getItem(polytrack_v4_prod_user_${OR(this, MR, "f").profileSlot})).nickname;`)
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
-        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", "DoraChad", 0);};
+        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", "DoraChad", ActivePolyModLoader.getMod("pdip").playerName);};
     `);
 
     this.car = null;
