@@ -57,7 +57,7 @@ class pdipMod extends PolyMod {
     }
     
     floorPopup = function(floor_num) {
-        if (this.pml.getSetting("popupSetting") === "true") {
+        if (this.pml.getSetting("popupSetting") === "false") {
             const color = popupInfo[floor_num - 1][1]
             const desc = popupInfo[floor_num -1][0]
             
@@ -311,7 +311,7 @@ class pdipMod extends PolyMod {
         
         this.barDiv = document.createElement("div");
     
-        if (this.pml.getSetting("barSetting") === "true") {this.barDiv.style.opacity = "0"};
+        if (this.pml.getSetting("barSetting") === "false") {this.barDiv.style.opacity = "0"};
         
         const bar = document.createElement("div");
         bar.className = "height-bar";
@@ -402,7 +402,7 @@ class pdipMod extends PolyMod {
         this.greenTimer.className = "green-timer";
         this.greenTimer.id = "green-timer";
     
-        if (this.pml.getSetting("timerSetting") === "true") {this.greenTimer.style.opacity = "0"};
+        if (this.pml.getSetting("timerSetting") === "false") {this.greenTimer.style.opacity = "0"};
     
         uiDiv.appendChild(this.greenTimer);
 
