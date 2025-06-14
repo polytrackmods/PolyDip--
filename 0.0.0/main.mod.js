@@ -494,7 +494,7 @@ class pdipMod extends PolyMod {
     this.playerSimHeight = 35;
     this.polyDipEnabled = false;
     this.trackId;
-    this.playerName;
+    this.playerName = "Anonymous";
 
       //SETTINGS BOOLS
 
@@ -625,7 +625,7 @@ class pdipMod extends PolyMod {
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, 'ActivePolyModLoader.getMod("pdip").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));ActivePolyModLoader.getMod("pdip").playerName = JSON.parse(localStorage.getItem("polytrack_v4_prod_user" + OR(this, MR, "f").profileSlot)).nickname;')
+    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, 'ActivePolyModLoader.getMod("pdip").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));')
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
