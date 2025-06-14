@@ -33,6 +33,12 @@ class Stopwatch {
     }
 
 class pdipMod extends PolyMod { 
+    pbFromServer = function(playerId) {
+            
+    };
+    pbToServer = function(playerId) {
+            
+    };
     addPlayer = function(player_id, player_name, player_height="36") {
         const arrow = document.createElement("div")
         arrow.className = "player-arrow";
