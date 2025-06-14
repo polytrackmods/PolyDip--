@@ -625,7 +625,7 @@ class pdipMod extends PolyMod {
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("${this.modID}").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));ActivePolyModLoader.getMod("${this.modID}").playerName = JSON.parse(localStorage.getItem(polytrack_v4_prod_user_${OR(this, MR, "f").profileSlot})).nickname;`)
+    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("${this.modID}").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));ActivePolyModLoader.getMod("${this.modID}").playerName = JSON.parse(localStorage.getItem("polytrack_v4_prod_user_${OR(this, MR, "f").profileSlot}")).nickname;`)
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
