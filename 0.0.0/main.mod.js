@@ -625,11 +625,11 @@ class pdipMod extends PolyMod {
     //MIXINS
 
     //keep track of what trackid the current track is (check if the track is polydip)
-    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, 'ActivePolyModLoader.getMod("pdip").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));')
+    polyModLoader.registerFuncMixin("UR", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("pdip").trackId = OR(this, TR, "f");console.log(OR(this, TR, "f"));`)
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
-        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", ActivePolyModLoader.getMod("pdip").playerName, 0)};
+        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", ActivePolyModLoader.getMod("pdip").playerName, 0);};
     `);
 
     this.car = null;
