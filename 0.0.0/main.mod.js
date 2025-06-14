@@ -495,7 +495,6 @@ class pdipMod extends PolyMod {
     this.polyDipEnabled = false;
     this.trackId;
     this.playerName = "Anonymous";
-    this.playerInfoClass;
 
       //SETTINGS BOOLS
 
@@ -633,7 +632,7 @@ class pdipMod extends PolyMod {
         if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI("690", ActivePolyModLoader.getMod("pdip").playerName, 0);};
     `);
 
-    polyModLoader.registerClassMixin("mL.prototype", MixinType.INSERT, 'getCurrentUserProfile() {', 'ActivePolyModLoader.getMod("pdip").playerInfoClass = fL(this, hL, "f").nickname;')
+    polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;')
 
     this.car = null;
     this.spectator = null;
