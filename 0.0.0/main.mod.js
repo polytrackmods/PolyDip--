@@ -504,13 +504,15 @@ class pdipMod extends PolyMod {
         return `${s}`;
     };
     removePolyDipUI = function() {
-        this.stopWatch.stop();
-        const leftDiv = document.getElementById("leftDiv");
-        leftDiv.remove();
-        const topDiv = document.getElementById("popupDiv");
-        topDiv.remove();
-        const timerGr = document.getElementById("green-timer");
-        timerGr.remove();
+        if(this.polyDipEnabled) {
+            this.stopWatch.stop();
+            const leftDiv = document.getElementById("leftDiv");
+            leftDiv.remove();
+            const topDiv = document.getElementById("popupDiv");
+            topDiv.remove();
+            const timerGr = document.getElementById("green-timer");
+            timerGr.remove();
+        }
     };
   init = function(polyModLoader) {
     this.pml = polyModLoader;
