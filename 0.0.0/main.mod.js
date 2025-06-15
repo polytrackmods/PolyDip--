@@ -677,11 +677,13 @@ class pdipMod extends PolyMod {
 
     }
     update = function() {
-        if(this.car) {
-            const carPos = this.car.getPosition();
-            this.updateHeight(this.car ? carPos.y : 35);
-            const heightIndex = this.floorHeights.indexOf(Math.round(carPos.y));
-            if (heightIndex !== -1) {this.checkFloor(heightIndex, carPos)};
+        if (polyDipEnabled) {
+                if(this.car) {
+                    const carPos = this.car.getPosition();
+                    this.updateHeight(this.car ? carPos.y : 35);
+                    const heightIndex = this.floorHeights.indexOf(Math.round(carPos.y));
+                    if (heightIndex !== -1) {this.checkFloor(heightIndex, carPos)};
+                }
         }
     }
 }
