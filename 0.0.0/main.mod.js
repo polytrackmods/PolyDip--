@@ -501,6 +501,7 @@ class pdipMod extends PolyMod {
         return `${s}`;
     };
     removePolyDipUI = function() {
+        this.stopWatch.stop();
         const leftDiv = document.getElementById("leftDiv");
         leftDiv.remove();
         const topDiv = document.getElementById("popupDiv");
@@ -673,7 +674,7 @@ class pdipMod extends PolyMod {
     polyModLoader.registerFuncMixin("pP", MixinType.INSERT, `yP(this, eP, "f").setColors(n.carColors),`, `ActivePolyModLoader.getMod("${this.modID}").car = yP(this, eP, "f"),`)
     polyModLoader.registerClassMixin("s_.prototype", "addToggleListener", MixinType.INSERT, `a_(this, QT, "f").push(e)`, `,ActivePolyModLoader.getMod("${this.modID}").spectator = this;`);
     polyModLoader.registerFuncMixin("polyInitFunction", MixinType.INSERT, `y.setAnimationLoop((function(e) {`, `ActivePolyModLoader.getMod("pdip").update();`)
-    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `ActivePolyModLoader.getMod("pdip").removePolyDipUI();`)
+    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `if (ActivePolyModLoader.getMod("pdip").polyDipEnabled) {ActivePolyModLoader.getMod("pdip").removePolyDipUI()};`)
 
     }
     update = function() {
