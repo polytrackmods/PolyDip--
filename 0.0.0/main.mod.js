@@ -664,7 +664,7 @@ class pdipMod extends PolyMod {
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
-        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(${this.pbHeight}, ActivePolyModLoader.getMod("pdip").playerName, 0);};
+        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(ActivePolyModLoader.getMod("pdip").pbHeight, ActivePolyModLoader.getMod("pdip").playerName, 0);};
     `);
 
     polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;')
