@@ -35,6 +35,7 @@ class Stopwatch {
 class pdipMod extends PolyMod { 
     pbFromServer = async function(playerId) {
         let pbJson = await fetch(`https://polydip.orangy.cfd/pb/${playerId}`).then((r) => r.json());
+        this.pbHeight = pbJson.pb;
         return pbJson;
     };
     pbToServer = function(playerId, playerName, pbHeight) {
@@ -526,7 +527,7 @@ class pdipMod extends PolyMod {
     this.pbHeight = 35;
     this.canCallFloor = true;
 
-    this.("test").then((r) => console.log(r));
+    this.pbFromServer("test").then((r) => console.log(r));
 
       //SETTINGS BOOLS
 
