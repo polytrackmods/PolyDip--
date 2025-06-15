@@ -35,14 +35,17 @@ class Stopwatch {
 class pdipMod extends PolyMod { 
     pbFromServer = async function(playerId) {
         let pbJson = await fetch(`https://polydip.orangy.cfd/pb/${playerId}`).then((r) => r.json());
-        this.pbHeight = pbJson.pb;
         return pbJson;
     };
     pbToServer = function(playerId, playerName, pbHeight) {
         fetch("https://polydip.orangy.cfd/updatepb", {
             method: "PUT",
+            headers: {
+                "Content-Type": "application/json"       // ← this is the key
+            },
             body: JSON.stringify({ userid: playerId, username: playerName, height: pbHeight })
         });
+        this.latestServerPB = pbHeight;
     };
     addPlayer = function(player_id, player_name, player_height="36") {
         const arrow = document.createElement("div")
@@ -351,7 +354,7 @@ class pdipMod extends PolyMod {
         this.heightText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
         
         this.pbText = document.createElement("p");
-        this.pbText.textContent = `PB: ${pb}m`;
+        this.pbText.textContent = `PB: ${this.pbHeight}m`;
         this.pbText.style.textShadow = "-2px -2px 0 black, 2px -2px 0 black, -2px 2px 0 black, 2px 2px 0 black, 0px 0px 5px black";
     
         textDiv.appendChild(this.heightText);
@@ -526,8 +529,10 @@ class pdipMod extends PolyMod {
     this.polyDipEnabled = false;
     this.trackId;
     this.playerName = "Anonymous";
+    this.tokenHash = "0";
     this.pbHeight = 35;
     this.canCallFloor = true;
+    this.canUploadPB = true;
 
     this.pbFromServer("test").then((r) => console.log(r));
 
@@ -667,7 +672,7 @@ class pdipMod extends PolyMod {
         if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(ActivePolyModLoader.getMod("pdip").pbHeight, ActivePolyModLoader.getMod("pdip").playerName, 0);};
     `);
 
-    polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;')
+    polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;ActivePolyModLoader.getMod("pdip").tokenHash = fL(this, hL, "f").tokenHash;')
 
     this.car = null;
     this.spectator = null;
@@ -687,6 +692,26 @@ class pdipMod extends PolyMod {
                 }
         }
     }
+    postInit = () => {
+        if(this.tokenHash !== "0") {
+            this.pbFromServer(this.tokenHash).then((r) => {
+                if(r.error) {
+                    console.log("No PB for user, skipping...")
+                    this.latestServerPB = 0;
+                } else {
+                    console.log(`Got PB of ${r.pb} for user ${this.tokenHash}.`)
+                    this.latestServerPB = parseInt(r.pb)
+                    this.pbHeight = parseInt(r.pb)
+                }
+            });
+        }
+        this.pbSyncInterval = setInterval(() => {
+            if(this.pbHeight >= this.floorHeights[1] && this.latestServerPB !== this.pbHeight) {
+                console.log(`Conditions met! Sending pb of ${this.pbHeight} to server...`)
+                this.pbToServer(this.tokenHash, this.playerName, this.pbHeight);
+            }
+        }, 5000)
+    };
 }
 
 export let polyMod = new pdipMod();
