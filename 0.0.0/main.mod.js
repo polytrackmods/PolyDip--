@@ -357,18 +357,18 @@ class pdipMod extends PolyMod {
         textDiv.appendChild(this.heightText);
         textDiv.appendChild(this.pbText);
     
-        let pbArrow = document.createElement("div");
-        pbArrow.className = "arrow";
-        pbArrow.style.background = "#00b8be";
-        pbArrow.style.bottom = `${this.roundNumber(pb)}%`;
-        pbArrow.style.zIndex = "1";
-        this.barDiv.appendChild(pbArrow);
+        this.pbArrow = document.createElement("div");
+        this.pbArrow.className = "arrow";
+        this.pbArrow.style.background = "#00b8be";
+        this.pbArrow.style.bottom = `${this.roundNumber(pb)}%`;
+        this.pbArrow.style.zIndex = "1";
+        this.barDiv.appendChild(this.pbArrow);
     
         const pbinnerText = document.createElement("p");
         pbinnerText.textContent = "PB";
         pbinnerText.style.transform = "translateX(-5px)";
     
-        pbArrow.appendChild(pbinnerText);
+        this.pbArrow.appendChild(pbinnerText);
     
         const barStyle = document.createElement('style');
         barStyle.textContent = `
