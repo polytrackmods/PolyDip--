@@ -33,11 +33,15 @@ class Stopwatch {
     }
 
 class pdipMod extends PolyMod { 
-    pbFromServer = function(playerId) {
-            
+    pbFromServer = async function(playerId) {
+        let pbJson = await fetch(`https://polydip.orangy.cfd/pb/${playerId}`).then((r) => r.json());
+        return pbJson;
     };
-    pbToServer = function(playerId) {
-            
+    pbToServer = function(playerId, playerName, pbHeight) {
+        fetch("https://polydip.orangy.cfd/updatepb", {
+            method: "PUT",
+            body: JSON.stringify({ userid: playerId, username: playerName, height: pbHeight })
+        });
     };
     addPlayer = function(player_id, player_name, player_height="36") {
         const arrow = document.createElement("div")
@@ -501,6 +505,8 @@ class pdipMod extends PolyMod {
     this.polyDipEnabled = false;
     this.trackId;
     this.playerName = "Anonymous";
+
+    this.pbFromServer("test").then((r) => console.log(r));
 
       //SETTINGS BOOLS
 
