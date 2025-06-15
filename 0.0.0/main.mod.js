@@ -470,6 +470,7 @@ class pdipMod extends PolyMod {
     };
     
     updatePbHeight = function(value) {
+        this.pbHeight = value;
         this.pbText.textContent = `PB: ${value}m`;
         this.pbArrow.style.bottom = `${this.roundNumber(value)}%`;
     };
