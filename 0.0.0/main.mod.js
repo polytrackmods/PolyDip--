@@ -677,7 +677,7 @@ class pdipMod extends PolyMod {
 
     }
     update = function() {
-        if (polyDipEnabled) {
+        if (this.polyDipEnabled) {
                 if(this.car) {
                     const carPos = this.car.getPosition();
                     this.updateHeight(this.car ? carPos.y : 35);
