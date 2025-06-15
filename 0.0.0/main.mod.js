@@ -68,8 +68,8 @@ class pdipMod extends PolyMod {
     
     floorPopup = function(floor_num) {
         if (this.pml.getSetting("popupSetting") === "false") {
-            const color = popupInfo[floor_num - 1][1]
-            const desc = popupInfo[floor_num -1][0]
+            const color = popupInfo[floor_num][1]
+            const desc = popupInfo[floor_num][0]
             
             const bar = document.getElementById("slide-bar");
             const bar2 = document.getElementById("slide-bar2");
@@ -445,14 +445,31 @@ class pdipMod extends PolyMod {
         document.head.appendChild(timerDivStyle);
     };
 
+    checkFloor = function(heightIndex, playerPos) {
+        if (!this.canCallFloor) return;
+        const floorX = this.floorXZ[heightIndex][0];
+        const floorZ = this.floorXZ[heightIndex][1];
+        if (playerPos.x < floorX || playerPos.x > floorX + 40) return;
+        if (playerPos.z < floorZ || playerPos.z > floorZ + 40) return;
+        this.canCallFloor = false;
+            
+        floorPopup(heightIndex);
+            
+        setTimeout(() => {
+            this.canCallFloor = true;
+        }, 30000);            
+    };
+
     updateHeight = function(value) {
         const heightPercent = this.roundNumber(value);
-        this.heightText.textContent = `Height: ${Math.round(value)}m (${heightPercent}%)`;
-        this.playerArrow.style.bottom = `${heightPercent}%`;    
+        const roundValue = Math.round(value)
+        this.heightText.textContent = `Height: ${roundValue}m (${heightPercent}%)`;
+        this.playerArrow.style.bottom = `${heightPercent}%`;   
+        if (this.pbHeight < roundValue) {this.updatePbHeight(roundValue)};
     };
     
     updatePbHeight = function(value) {
-        this.pbText.textContent = `PB: ${Math.round(value)}m`;
+        this.pbText.textContent = `PB: ${value}m`;
         this.pbArrow.style.bottom = `${this.roundNumber(value)}%`;
     };
     
@@ -498,6 +515,7 @@ class pdipMod extends PolyMod {
     this.pbArrow;
     this.playerArrow;
     this.floorHeights = [35, 105, 245, 365, 500, 645, 770, 885, 1025, 1150, 1295, 1425, 1580, 1720, 1855, 1990, 2110, 2395];
+    this.floorXZ = [[NaN, NaN], [650, -30], [370, 210], [130, -70], [410, -310], [650, 10], [170, 170], [130, -70], [370, -310], [650, 10], [410, 210], [130, -70], [390, -270], [650, -70], [370, 210], [130, -30], [410, -310], [NaN, NaN]]
     this.popupInfo = [["Cold Beginning", "#5DE2E7"],["xddlent", "#FFECA1"],["Summer Slide", "#FFCC00"],["You're Skewed", "#FFFFFF"],["Thawing Temple", "#E75480"],["The Knot", "#7DDA58"],["The Sponge", "#060270"],["Koopa Troopa", "#b9f2ff"],["Strawberry Cheesecake", "#8b0000"],["Ice Gold", "#FE9900"],["Missing Pieces", "#020202"],["Paarse Ramp", "#CC6CE7"],["Iolites Trace", "#FFB6C1"],["Spider Sense", "#013220"],["Scared of Dragons?", "#CECECE"],["On the Edge", "#FD7C79"]];
     this.greenTimer;
     this.stopWatch = new Stopwatch();
@@ -505,8 +523,10 @@ class pdipMod extends PolyMod {
     this.polyDipEnabled = false;
     this.trackId;
     this.playerName = "Anonymous";
+    this.pbHeight = 35;
+    this.canCallFloor = true;
 
-    this.pbFromServer("test").then((r) => console.log(r));
+    this.("test").then((r) => console.log(r));
 
       //SETTINGS BOOLS
 
@@ -656,7 +676,10 @@ class pdipMod extends PolyMod {
     }
     update = function() {
         if(this.car) {
-            this.updateHeight(this.car ? this.car.getPosition().y : 35);
+            const carPos = this.car.getPosition();
+            this.updateHeight(this.car ? carPos.y : 35);
+            const heightIndex = this.floorHeights.indexOf(carPos.y);
+            if (heightIndex !== -1) {this.checkFloor(heightIndex, carPos)};
         }
     }
 }
