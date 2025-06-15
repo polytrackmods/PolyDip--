@@ -454,7 +454,7 @@ class pdipMod extends PolyMod {
         if (playerPos.z < floorZ || playerPos.z > floorZ + 40) return;
         this.canCallFloor = false;
             
-        floorPopup(heightIndex);
+        this.floorPopup(heightIndex);
             
         setTimeout(() => {
             this.canCallFloor = true;
