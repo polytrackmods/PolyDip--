@@ -790,7 +790,7 @@ class pdipMod extends PolyMod {
                 console.log(`Conditions met! Sending pb of ${this.pbHeight} to server...`)
                 this.pbToServer(this.tokenHash, this.playerName, this.pbHeight);
             };
-            if (!this.isInPB && this.playerHeightNow - this.lastRecordedHeight < -60) {
+            if (this.isInPB && this.playerHeightNow - this.lastRecordedHeight < -60) {
                 this.isInPB = false;
             };
         }, 5000)
