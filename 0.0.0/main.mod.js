@@ -47,6 +47,15 @@ class pdipMod extends PolyMod {
         });
         this.latestServerPB = pbHeight;
     };
+    fetchWR = async function() {
+        let pbJson = await fetch("https://polydip.orangy.cfd/wr").then((r) => r.json());
+        return pbJson;
+    };
+    checkWR = async function() {
+        this.fetchWR().then((r) => {
+                if (this.wrHeight != parseInt(r.height)) {this.updateWRHeight(r.height)};
+        });
+    };
     addPlayer = function(player_id, player_name, player_height="36") {
         const arrow = document.createElement("div")
         arrow.className = "player-arrow";
@@ -112,7 +121,21 @@ class pdipMod extends PolyMod {
           const isLast = i === this.floorHeights.length - 1;
       
           if (isLast) {
-              this.createArrow("gold", `${this.roundNumber(height)}%`, `Fin`);
+                this.createArrow("gold", , `Fin`);
+                const arrow = document.createElement("div");
+                arrow.className = "arrow";
+                arrow.style.backgroundImage = "linear-gradient(90deg, black 25%, white 25%, white 50%, black 50%, black 75%, white 75%, white 100%), linear-gradient(0deg, black 25%, white 25%, white 50%, black 50%, black 75%, white 75%, white 100%)";
+                arrow.style.backgroundSize = "30px 30px";
+                arrow.style.backgroundBlendMode = "difference";
+                arrow.style.bottom = `${this.roundNumber(height)}%`;
+                this.barDiv.appendChild(arrow);
+            
+                const innerText = document.createElement("p");
+                innerText.textContent = Fin;
+                innerText.style.transform = "translateX(-5px)";
+            
+                arrow.appendChild(innerText);
+                
           } else {
               this.createArrow("gray", `${this.roundNumber(height)}%`, `${i}`);
           }
@@ -372,6 +395,19 @@ class pdipMod extends PolyMod {
         pbinnerText.style.transform = "translateX(-5px)";
     
         this.pbArrow.appendChild(pbinnerText);
+
+        this.wrArrow = document.createElement("div");
+        this.wrArrow.className = "arrow";
+        this.wrArrow.style.background = "gold";
+        this.wrArrow.style.bottom = `${this.roundNumber(this.wrHeight)}%`;
+        this.wrArrow.style.zIndex = "1";
+        this.barDiv.appendChild(this.wrArrow);
+    
+        const wrinnerText = document.createElement("p");
+        wrinnerText.textContent = "WR";
+        wrinnerText.style.transform = "translateX(-5px)";
+    
+        this.wrArrow.appendChild(wrinnerText);
     
         const barStyle = document.createElement('style');
         barStyle.textContent = `
@@ -449,6 +485,11 @@ class pdipMod extends PolyMod {
         document.head.appendChild(timerDivStyle);
     };
 
+    updateWRHeight = function(value) {
+        this.wrHeight = value;
+        this.wrArrow.style.bottom = `${this.roundNumber(value)}%`;
+    };
+
     checkFloor = function(heightIndex, playerPos) {
         if (!this.canCallFloor) return;
         const floorX = this.floorXZ[heightIndex][0];
@@ -521,6 +562,7 @@ class pdipMod extends PolyMod {
     this.pbText;
     this.barDiv;
     this.pbArrow;
+    this.wrArrow;
     this.playerArrow;
     this.floorHeights = [35, 105, 245, 365, 500, 645, 770, 885, 1025, 1150, 1295, 1425, 1580, 1720, 1855, 1990, 2110, 2395];
     this.floorXZ = [[NaN, NaN], [650, -30], [370, 210], [130, -70], [410, -310], [650, 10], [170, 170], [130, -70], [370, -310], [650, 10], [410, 210], [130, -70], [390, -270], [650, -70], [370, 210], [130, -30], [410, -310], [NaN, NaN]]
@@ -535,6 +577,7 @@ class pdipMod extends PolyMod {
     this.pbHeight = 35;
     this.canCallFloor = true;
     this.canUploadPB = true;
+    this.wrHeight;
 
     this.pbFromServer("test").then((r) => console.log(r));
 
@@ -704,6 +747,15 @@ class pdipMod extends PolyMod {
                     console.log(`Got PB of ${r.pb} for user ${this.tokenHash}.`)
                     this.latestServerPB = parseInt(r.pb)
                     this.pbHeight = parseInt(r.pb)
+                }
+            });
+            this.fetchWR().then((r) => {
+                if(r.error) {
+                    console.log("Error Fetching WR")
+                    this.wrHeight = 0;
+                } else {
+                    console.log(`WR of ${r.height} for user ${this.tokenHash}.`)
+                    this.wrHeight = parseInt(r.height)
                 }
             });
         }
