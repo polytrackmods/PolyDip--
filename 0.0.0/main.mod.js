@@ -56,6 +56,7 @@ class pdipMod extends PolyMod {
         this.pbFromServer(this.tokenHash).then((r) => {
                 if(r.error) {
                     console.log("No PB for user, skipping...")
+                    this.pbHeight = 0;
                     this.latestServerPB = 0;
                 } else {
                     console.log(`Got PB of ${r.pb} for user ${this.tokenHash}.`)
