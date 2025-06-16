@@ -567,14 +567,12 @@ class pdipMod extends PolyMod {
     };
     removePolyDipUI = function() {
         if(this.polyDipEnabled) {
+            this.polyDipEnabled = false;
             this.canCallFloor = true;
             this.stopWatch.stop();
-            const leftDiv = document.getElementById("leftDiv");
-            leftDiv.remove();
-            const topDiv = document.getElementById("popupDiv");
-            topDiv.remove();
-            const timerGr = document.getElementById("green-timer");
-            timerGr.remove();
+            document.getElementById("leftDiv").remove();
+            document.getElementById("popupDiv").remove();
+            document.getElementById("green-timer").remove();
         }
     };
     rainbowPB = function(height) {
