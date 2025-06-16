@@ -772,8 +772,6 @@ class pdipMod extends PolyMod {
                     navigator.sendBeacon("https://polydip.orangy.cfd/updatepb", new Blob([data], { type: "application/json" }));
                 }
         }};`);
-
-    }
     update = function() {
         if (this.polyDipEnabled) {
                 if(this.car) {
