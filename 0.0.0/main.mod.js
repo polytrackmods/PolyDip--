@@ -537,7 +537,7 @@ class pdipMod extends PolyMod {
         this.pbHeight = value;
         this.pbText.textContent = `PB: ${value}m`;
         this.pbArrow.style.bottom = `${this.roundNumber(value)}%`;
-        if (this.isInPB) {this.rainbowPB(value)};
+        if (!this.isInPB) {this.rainbowPB(value);this.isInPB = true;};
     };
     
     createArrow = function(bg_color, height, inner_text, z_index="auto") {
@@ -576,6 +576,56 @@ class pdipMod extends PolyMod {
             const timerGr = document.getElementById("green-timer");
             timerGr.remove();
         }
+    };
+    rainbowPB = function(height) {
+        const pbText = `NEW PB ${height} m`
+        const uicont = document.getElementById("ui");
+        const container = document.createElement("div");
+        container.style.position = "absolute";
+        container.style.top = "25%";
+        container.style.left = "calc(50% - 275px)";
+        container.style.fontSize = "80px";
+        container.style.fontWeight = "bold";
+        container.style.width = "550px";
+        container.style.gap = "2px";
+        container.style.letterSpacing = "2px";
+        uicont.appendChild(container);
+    
+        const letters = pbText.split("").map((char, i) => {
+            const span = document.createElement("span");
+            span.textContent = char === " " ? "\u00A0" : char;
+            span.style.display = "inline-block";
+            container.appendChild(span);
+            return span;
+        });
+    
+        let t = 0;
+        let animationId;
+        
+        function animate() {
+          t += 0.1;
+          letters.forEach((letter, i) => {
+            const offset = Math.sin(t + i * 0.3) * 20;
+            letter.style.transform = `translateY(${offset}px)`;
+        
+            const hue = (t * 40 + i * 20) % 360;
+            letter.style.color = `hsl(${hue}, 100%, 50%)`;
+          });
+        
+          animationId = requestAnimationFrame(animate);
+        }
+        
+        animate();
+        
+        // 7 sec
+        setTimeout(() => {
+            container.classList.add("fade-text")
+        }, 6500);
+        
+        setTimeout(() => {
+            cancelAnimationFrame(animationId);
+            container.remove()
+        }, 8000);
     };
   init = function(polyModLoader) {
     this.pml = polyModLoader;
@@ -634,57 +684,6 @@ class pdipMod extends PolyMod {
         }
     `
     document.head.appendChild(fadeOut);
-    
-    const rainbowPB = function(height) {
-        const pbText = `NEW PB ${height} m`
-        const uicont = document.getElementById("ui");
-        const container = document.createElement("div");
-        container.style.position = "absolute";
-        container.style.top = "25%";
-        container.style.left = "calc(50% - 275px)";
-        container.style.fontSize = "80px";
-        container.style.fontWeight = "bold";
-        container.style.width = "550px";
-        container.style.gap = "2px";
-        container.style.letterSpacing = "2px";
-        uicont.appendChild(container);
-    
-        const letters = pbText.split("").map((char, i) => {
-            const span = document.createElement("span");
-            span.textContent = char === " " ? "\u00A0" : char;
-            span.style.display = "inline-block";
-            container.appendChild(span);
-            return span;
-        });
-    
-        let t = 0;
-    let animationId;
-    
-    function animate() {
-      t += 0.1;
-      letters.forEach((letter, i) => {
-        const offset = Math.sin(t + i * 0.3) * 20;
-        letter.style.transform = `translateY(${offset}px)`;
-    
-        const hue = (t * 40 + i * 20) % 360;
-        letter.style.color = `hsl(${hue}, 100%, 50%)`;
-      });
-    
-      animationId = requestAnimationFrame(animate);
-    }
-    
-    animate();
-    
-    // 7 sec
-    setTimeout(() => {
-        container.classList.add("fade-text")
-    }, 6500);
-    
-    setTimeout(() => {
-        cancelAnimationFrame(animationId);
-        container.remove()
-    }, 8000);
-    }
     
     
     const hideUI = function(id) {
@@ -747,10 +746,11 @@ class pdipMod extends PolyMod {
 
     this.car = null;
     this.spectator = null;
-    polyModLoader.registerFuncMixin("pP", MixinType.INSERT, `yP(this, eP, "f").setColors(n.carColors),`, `ActivePolyModLoader.getMod("${this.modID}").car = yP(this, eP, "f"),`)
+    polyModLoader.registerFuncMixin("pP", MixinType.INSERT, `yP(this, eP, "f").setColors(n.carColors),`, `ActivePolyModLoader.getMod("${this.modID}").car = yP(this, eP, "f"),`);
+    polyModLoader.registerFuncMixin("uP", MixinType.INSERT, `var e;`, `ActivePolyModLoader.getMod("pdip").isInPB = false;`);
     polyModLoader.registerClassMixin("s_.prototype", "addToggleListener", MixinType.INSERT, `a_(this, QT, "f").push(e)`, `,ActivePolyModLoader.getMod("${this.modID}").spectator = this;`);
-    polyModLoader.registerFuncMixin("polyInitFunction", MixinType.INSERT, `y.setAnimationLoop((function(e) {`, `ActivePolyModLoader.getMod("pdip").update();`)
-    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `if (ActivePolyModLoader.getMod("pdip").polyDipEnabled) {ActivePolyModLoader.getMod("pdip").removePolyDipUI()};`)
+    polyModLoader.registerFuncMixin("polyInitFunction", MixinType.INSERT, `y.setAnimationLoop((function(e) {`, `ActivePolyModLoader.getMod("pdip").update();`);
+    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `if (ActivePolyModLoader.getMod("pdip").polyDipEnabled) {ActivePolyModLoader.getMod("pdip").removePolyDipUI()};`);
 
     }
     update = function() {
