@@ -525,6 +525,7 @@ class pdipMod extends PolyMod {
     };
 
     updateHeight = function(value) {
+        this.playerHeightNow = value;
         const heightPercent = this.roundNumber(value);
         const roundValue = Math.round(value)
         this.heightText.textContent = `Height: ${roundValue}m (${heightPercent}%)`;
@@ -536,6 +537,7 @@ class pdipMod extends PolyMod {
         this.pbHeight = value;
         this.pbText.textContent = `PB: ${value}m`;
         this.pbArrow.style.bottom = `${this.roundNumber(value)}%`;
+        if (this.isInPB) {this.rainbowPB(value)};
     };
     
     createArrow = function(bg_color, height, inner_text, z_index="auto") {
@@ -598,6 +600,9 @@ class pdipMod extends PolyMod {
     this.canCallFloor = true;
     this.canUploadPB = true;
     this.wrHeight;
+    this.isInPB = false;
+    this.lastRecordedHeight = 0;
+    this.playerHeightNow;
 
     this.pbFromServer("test").then((r) => console.log(r));
 
@@ -784,7 +789,10 @@ class pdipMod extends PolyMod {
             if(this.pbHeight >= this.floorHeights[1] && this.latestServerPB !== this.pbHeight) {
                 console.log(`Conditions met! Sending pb of ${this.pbHeight} to server...`)
                 this.pbToServer(this.tokenHash, this.playerName, this.pbHeight);
-            }
+            };
+            if (!this.isInPB && this.playerHeightNow - this.lastRecordedHeight < -60) {
+                this.isInPB = false;
+            };
         }, 5000)
     };
 }
