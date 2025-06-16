@@ -47,11 +47,28 @@ class pdipMod extends PolyMod {
         });
         this.latestServerPB = pbHeight;
     };
+    updateUserPB = function(newToken) {
+        if (this.pbHeight >= this.floorHeights[1] && this.latestServerPB !== this.pbHeight) {
+                console.log(`Conditions met! Sending pb of ${this.pbHeight} to server...`)
+                this.pbToServer(this.tokenHash, this.playerName, this.pbHeight);
+        };
+        this.tokenHash = newToken;
+        this.pbFromServer(this.tokenHash).then((r) => {
+                if(r.error) {
+                    console.log("No PB for user, skipping...")
+                    this.latestServerPB = 0;
+                } else {
+                    console.log(`Got PB of ${r.pb} for user ${this.tokenHash}.`)
+                    this.latestServerPB = parseInt(r.pb)
+                    this.pbHeight = parseInt(r.pb)
+                }
+        });
+    };
     fetchWR = async function() {
         let pbJson = await fetch("https://polydip.orangy.cfd/wr").then((r) => r.json());
         return pbJson;
     };
-    checkWR = async function() {
+    checkWR = function() {
         this.fetchWR().then((r) => {
                 if (this.wrHeight != parseInt(r.height)) {this.updateWRHeight(r.height)};
         });
@@ -716,7 +733,8 @@ class pdipMod extends PolyMod {
         if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(ActivePolyModLoader.getMod("pdip").pbHeight, ActivePolyModLoader.getMod("pdip").playerName, 0);};
     `);
 
-    polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;ActivePolyModLoader.getMod("pdip").tokenHash = fL(this, hL, "f").tokenHash;')
+    polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;ActivePolyModLoader.getMod("pdip").tokenHash = fL(this, hL, "f").tokenHash;');
+    polyModLoader.registerClassMixin("mL.prototype", "setProfileSlot", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").updateUserPB(fL(this, hL, "f").tokenHash);');
 
     this.car = null;
     this.spectator = null;
@@ -748,13 +766,13 @@ class pdipMod extends PolyMod {
                     this.pbHeight = parseInt(r.pb)
                 }
             });
-            this.fetchWR().then((r) => {
-                if(r.error) {
+            this.fetchWR().then((b) => {
+                if(b.error) {
                     console.log("Error Fetching WR")
                     this.wrHeight = 0;
                 } else {
-                    console.log(`WR of ${r.height} for user ${this.tokenHash}.`)
-                    this.wrHeight = parseInt(r.height)
+                    console.log(`WR of ${b.height}.`)
+                    this.wrHeight = parseInt(b.height)
                 }
             });
         }
