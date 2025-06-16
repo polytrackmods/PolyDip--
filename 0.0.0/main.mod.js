@@ -121,7 +121,6 @@ class pdipMod extends PolyMod {
           const isLast = i === this.floorHeights.length - 1;
       
           if (isLast) {
-                this.createArrow("gold", , `Fin`);
                 const arrow = document.createElement("div");
                 arrow.className = "arrow";
                 arrow.style.backgroundImage = "linear-gradient(90deg, black 25%, white 25%, white 50%, black 50%, black 75%, white 75%, white 100%), linear-gradient(0deg, black 25%, white 25%, white 50%, black 50%, black 75%, white 75%, white 100%)";
