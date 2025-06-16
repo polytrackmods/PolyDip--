@@ -98,9 +98,9 @@ class pdipMod extends PolyMod {
     }
     
     floorPopup = function(floor_num) {
-        if (this.pml.getSetting("popupSetting") === "false") {
-            const color = popupInfo[floor_num][1]
-            const desc = popupInfo[floor_num][0]
+        if (this.pml.getSetting("popupSetting") === "true") {
+            const color = this.popupInfo[floor_num][1]
+            const desc = this.popupInfo[floor_num][0]
             
             const bar = document.getElementById("slide-bar");
             const bar2 = document.getElementById("slide-bar2");
@@ -509,12 +509,14 @@ class pdipMod extends PolyMod {
 
     checkFloor = function(heightIndex, playerPos) {
         if (!this.canCallFloor) return;
+        if (heightIndex == 16 || heightIndex == 0) return;
         const floorX = this.floorXZ[heightIndex][0];
         const floorZ = this.floorXZ[heightIndex][1];
-        if (playerPos.x < floorX || playerPos.x > floorX + 40) return;
-        if (playerPos.z < floorZ || playerPos.z > floorZ + 40) return;
+        if (playerPos.x < floorX || playerPos.x > floorX + 40) {console.log(`x check failed for floor ${heightIndex} hitbox`);return;};
+        if (playerPos.z < floorZ || playerPos.z > floorZ + 40) {console.log(`z check failed for floor ${heightIndex} hitbox`);return;};
         this.canCallFloor = false;
-            
+
+        console.log(`Floor Popup Called for floor ${heightIndex}`)
         this.floorPopup(heightIndex);
             
         setTimeout(() => {
@@ -563,6 +565,7 @@ class pdipMod extends PolyMod {
     };
     removePolyDipUI = function() {
         if(this.polyDipEnabled) {
+            this.canCallFloor = true;
             this.stopWatch.stop();
             const leftDiv = document.getElementById("leftDiv");
             leftDiv.remove();
