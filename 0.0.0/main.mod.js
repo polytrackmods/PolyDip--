@@ -53,13 +53,13 @@ class pdipMod extends PolyMod {
                 this.pbToServer(this.tokenHash, this.playerName, this.pbHeight);
         };
         this.tokenHash = newToken;
-        this.pbFromServer(this.tokenHash).then((r) => {
+        this.pbFromServer(newToken).then((r) => {
                 if(r.error) {
                     console.log("No PB for user, skipping...")
                     this.pbHeight = 0;
                     this.latestServerPB = 0;
                 } else {
-                    console.log(`Got PB of ${r.pb} for user ${this.tokenHash}.`)
+                    console.log(`Got PB of ${r.pb} for user ${newToken}.`)
                     this.latestServerPB = parseInt(r.pb)
                     this.pbHeight = parseInt(r.pb)
                 }
