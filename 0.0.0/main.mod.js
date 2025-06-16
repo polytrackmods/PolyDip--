@@ -130,7 +130,7 @@ class pdipMod extends PolyMod {
                 this.barDiv.appendChild(arrow);
             
                 const innerText = document.createElement("p");
-                innerText.textContent = Fin;
+                innerText.textContent = "Fin";
                 innerText.style.transform = "translateX(-5px)";
             
                 arrow.appendChild(innerText);
