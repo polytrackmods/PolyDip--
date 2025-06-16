@@ -1,11 +1,12 @@
 import { PolyMod, MixinType } from "https://pml.orangy.cfd/PolyTrackMods/PolyModLoader/0.5.0/PolyModLoader.js";
 
 
-let timeLength = 0;
+
 class Stopwatch {
-        constructor() {
+        constructor(modClass) {
             this.interval = null;
             this.running = false;
+            this.modClass = modClass;
         }
         setTimer(q) {
             this.ui = q;
@@ -16,8 +17,8 @@ class Stopwatch {
             this.running = true;
             
             this.interval = setInterval(() => {
-                timeLength++;
-                this.ui ? this.ui.textContent = polyMod.formatSeconds(timeLength) : null;
+                this.modClass.timeLength++;
+                this.ui ? this.ui.textContent = polyMod.formatSeconds(this.modClass.timeLength) : null;
             }, 1000);
         }
     
@@ -27,12 +28,18 @@ class Stopwatch {
         }
         clear() {
             this.stop();
-            this.ui ? this.ui.textContent = polyMod.formatSeconds(timeLength) : null;
-            timeLength = 0;
+            this.ui ? this.ui.textContent = polyMod.formatSeconds(this.modClass.timeLength) : null;
+            this.modClass.timeLength = 0;
         }
     }
 
 class pdipMod extends PolyMod { 
+    getGreenStorage = function(userToken) {
+        return localStorage.getItem(`pdip_timer_${userToken}`);
+    };
+    setGreenStorage = function(userToken) {
+        localStorage.setItem(`pdip_timer_${userToken}`, this.timeLength);
+    };
     pbFromServer = async function(playerId) {
         let pbJson = await fetch(`https://polydip.orangy.cfd/pb/${playerId}`).then((r) => r.json());
         return pbJson;
@@ -638,7 +645,8 @@ class pdipMod extends PolyMod {
     this.floorXZ = [[NaN, NaN], [650, -30], [370, 210], [130, -70], [410, -310], [650, 10], [170, 170], [130, -70], [370, -310], [650, 10], [410, 210], [130, -70], [390, -270], [650, -70], [370, 210], [130, -30], [410, -310], [NaN, NaN]]
     this.popupInfo = [["Cold Beginning", "#5DE2E7"],["xddlent", "#FFECA1"],["Summer Slide", "#FFCC00"],["You're Skewed", "#FFFFFF"],["Thawing Temple", "#E75480"],["The Knot", "#7DDA58"],["The Sponge", "#060270"],["Koopa Troopa", "#b9f2ff"],["Strawberry Cheesecake", "#8b0000"],["Ice Gold", "#FE9900"],["Missing Pieces", "#020202"],["Paarse Ramp", "#CC6CE7"],["Iolites Trace", "#FFB6C1"],["Spider Sense", "#013220"],["Scared of Dragons?", "#CECECE"],["On the Edge", "#FD7C79"]];
     this.greenTimer;
-    this.stopWatch = new Stopwatch();
+    this.timeLength = 0;
+    this.stopWatch = new Stopwatch(this);
     this.playerSimHeight = 35;
     this.polyDipEnabled = false;
     this.trackId;
@@ -736,7 +744,7 @@ class pdipMod extends PolyMod {
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
-        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(ActivePolyModLoader.getMod("pdip").pbHeight, ActivePolyModLoader.getMod("pdip").playerName, 0);};
+        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(ActivePolyModLoader.getMod("pdip").pbHeight, ActivePolyModLoader.getMod("pdip").playerName, ActivePolyModLoader.getMod("pdip").timeLength);};
     `);
 
     polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;ActivePolyModLoader.getMod("pdip").tokenHash = fL(this, hL, "f").tokenHash;');
@@ -748,7 +756,22 @@ class pdipMod extends PolyMod {
     polyModLoader.registerFuncMixin("uP", MixinType.INSERT, `var e;`, `ActivePolyModLoader.getMod("pdip").isInPB = false;`);
     polyModLoader.registerClassMixin("s_.prototype", "addToggleListener", MixinType.INSERT, `a_(this, QT, "f").push(e)`, `,ActivePolyModLoader.getMod("${this.modID}").spectator = this;`);
     polyModLoader.registerFuncMixin("polyInitFunction", MixinType.INSERT, `y.setAnimationLoop((function(e) {`, `ActivePolyModLoader.getMod("pdip").update();`);
-    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `if (ActivePolyModLoader.getMod("pdip").polyDipEnabled) {ActivePolyModLoader.getMod("pdip").removePolyDipUI()};`);
+    polyModLoader.registerClassMixin("pk.prototype", "dispose", MixinType.INSERT, `{`, `
+    const modInst = ActivePolyModLoader.getMod("pdip");
+    if (modInst.polyDipEnabled) {
+        modInst.removePolyDipUI();
+        modInst.setGreenStorage(ActivePolyModLoader.getMod("pdip").tokenHash);
+        window.addEventListener("beforeunload", () => {
+                modInst.setGreenStorage(modInst.tokenHash);
+                if(modInst.pbHeight >= modInst.floorHeights[1] && modInst.latestServerPB !== modInst.pbHeight) {
+                    const data = JSON.stringify({
+                        userid: modInst.tokenHash,
+                        username: modInst.playerName,
+                        height: modInst.pbHeight
+                    });
+                    navigator.sendBeacon("https://polydip.orangy.cfd/updatepb", new Blob([data], { type: "application/json" }));
+                }
+        }};`);
 
     }
     update = function() {
@@ -762,6 +785,7 @@ class pdipMod extends PolyMod {
         }
     }
     postInit = () => {
+        this.timeLength = this.getGreenStorage() ?? 0;
         if(this.tokenHash !== "0") {
             this.pbFromServer(this.tokenHash).then((r) => {
                 if(r.error) {
