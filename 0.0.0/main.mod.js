@@ -742,7 +742,7 @@ class pdipMod extends PolyMod {
     `);
 
     polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;ActivePolyModLoader.getMod("pdip").tokenHash = fL(this, hL, "f").tokenHash;');
-    polyModLoader.registerClassMixin("mL.prototype", "setProfileSlot", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").updateUserPB(fL(this, hL, "f").tokenHash);');
+    polyModLoader.registerClassMixin("mL.prototype", "setProfileSlot", MixinType.INSERT, 'pL(this, hL, fL(this, sL, "m", uL).call(this, fL(this, cL, "f")), "f"),', 'ActivePolyModLoader.getMod("pdip").updateUserPB(fL(this, hL, "f").tokenHash),');
 
     this.car = null;
     this.spectator = null;
