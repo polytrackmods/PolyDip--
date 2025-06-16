@@ -793,6 +793,7 @@ class pdipMod extends PolyMod {
             if (this.isInPB && this.playerHeightNow - this.lastRecordedHeight < -60) {
                 this.isInPB = false;
             };
+            this.lastRecordedHeight = this.playerHeightNow;
         }, 5000)
     };
 }
