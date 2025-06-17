@@ -763,21 +763,6 @@ class pdipMod extends PolyMod {
         modInst.removePolyDipUI();
 
         localStorage.setItem(\`pdip_timer_\${modInst.tokenHash}\`, modInst.timeLength);
-        
-        window.addEventListener("beforeunload", () => {
-
-            localStorage.setItem(\`pdip_timer_\${modInst.tokenHash}\`, modInst.timeLength);
-
-            
-            if(modInst.pbHeight >= modInst.floorHeights[1] && modInst.latestServerPB !== modInst.pbHeight) {
-                const data = JSON.stringify({
-                    userid: modInst.tokenHash,
-                    username: modInst.playerName,
-                    height: modInst.pbHeight
-                });
-                navigator.sendBeacon("https://polydip.orangy.cfd/updatepb", new Blob([data], { type: "application/json" }));
-            }
-        })
     }`);
       
     }
