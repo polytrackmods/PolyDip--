@@ -1,7 +1,6 @@
 import { PolyMod, MixinType } from "https://pml.orangy.cfd/PolyTrackMods/PolyModLoader/0.5.0/PolyModLoader.js";
 
 
-
 class Stopwatch {
         constructor(modClass) {
             this.interval = null;
@@ -33,13 +32,8 @@ class Stopwatch {
         }
     }
 
+
 class pdipMod extends PolyMod { 
-    getGreenStorage = function(userToken) {
-        return localStorage.getItem(`pdip_timer_${userToken}`);
-    };
-    setGreenStorage = function(userToken) {
-        localStorage.setItem(`pdip_timer_${userToken}`, this.timeLength);
-    };
     pbFromServer = async function(playerId) {
         let pbJson = await fetch(`https://polydip.orangy.cfd/pb/${playerId}`).then((r) => r.json());
         return pbJson;
@@ -481,7 +475,7 @@ class pdipMod extends PolyMod {
         uiDiv.appendChild(this.greenTimer);
 
         const timer = document.createElement("p");
-        timer.textContent = this.formatSeconds(timer_value);
+        timer.textContent = this.formatSeconds(this.timeLength);
         this.stopWatch.setTimer(timer);
 
         this.greenTimer.appendChild(timer);   
@@ -580,27 +574,28 @@ class pdipMod extends PolyMod {
             document.getElementById("leftDiv").remove();
             document.getElementById("popupDiv").remove();
             document.getElementById("green-timer").remove();
+            if (this.rainbowDiv) {this.rainbowDiv.remove()};
         }
     };
     rainbowPB = function(height) {
         const pbText = `NEW PB ${height} m`
         const uicont = document.getElementById("ui");
-        const container = document.createElement("div");
-        container.style.position = "absolute";
-        container.style.top = "25%";
-        container.style.left = "calc(50% - 275px)";
-        container.style.fontSize = "80px";
-        container.style.fontWeight = "bold";
-        container.style.width = "550px";
-        container.style.gap = "2px";
-        container.style.letterSpacing = "2px";
-        uicont.appendChild(container);
+        this.rainbowDiv = document.createElement("div");
+        this.rainbowDiv.style.position = "absolute";
+        this.rainbowDiv.style.top = "25%";
+        this.rainbowDiv.style.left = "calc(50% - 275px)";
+        this.rainbowDiv.style.fontSize = "80px";
+        this.rainbowDiv.style.fontWeight = "bold";
+        this.rainbowDiv.style.width = "550px";
+        this.rainbowDiv.style.gap = "2px";
+        this.rainbowDiv.style.letterSpacing = "2px";
+        uicont.appendChild(this.rainbowDiv);
     
         const letters = pbText.split("").map((char, i) => {
             const span = document.createElement("span");
             span.textContent = char === " " ? "\u00A0" : char;
             span.style.display = "inline-block";
-            container.appendChild(span);
+            this.rainbowDiv.appendChild(span);
             return span;
         });
     
@@ -624,12 +619,13 @@ class pdipMod extends PolyMod {
         
         // 7 sec
         setTimeout(() => {
-            container.classList.add("fade-text")
+            this.rainbowDiv.classList.add("fade-text")
         }, 6500);
         
         setTimeout(() => {
             cancelAnimationFrame(animationId);
-            container.remove()
+            this.rainbowDiv.remove()
+            this.rainbowDiv = null;
         }, 8000);
     };
   init = function(polyModLoader) {
@@ -659,6 +655,7 @@ class pdipMod extends PolyMod {
     this.isInPB = false;
     this.lastRecordedHeight = 0;
     this.playerHeightNow;
+    this.rainbowDiv = null;
 
     this.pbFromServer("test").then((r) => console.log(r));
 
@@ -744,7 +741,11 @@ class pdipMod extends PolyMod {
 
     //main ui from here
     polyModLoader.registerFuncMixin("dP", MixinType.INSERT, 'if (e) {', `
-        if(ActivePolyModLoader.getMod("pdip").trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){ActivePolyModLoader.getMod("pdip").createPolyDipUI(ActivePolyModLoader.getMod("pdip").pbHeight, ActivePolyModLoader.getMod("pdip").playerName, ActivePolyModLoader.getMod("pdip").timeLength);};
+        const modInst = ActivePolyModLoader.getMod("pdip");
+        if(modInst.trackId == "8cbcb138be4608cbc2b12f956dfadcf66ebfcf013788f0f34abc2603909fde50"){
+            modInst.timeLength = localStorage.getItem(\`pdip_timer_\${modInst.tokenHash}\`) ?? 0;
+            modInst.createPolyDipUI(modInst.pbHeight, modInst.playerName, 0);
+        };
     `);
 
     polyModLoader.registerClassMixin("mL.prototype", "getCurrentUserProfile", MixinType.INSERT, '{', 'ActivePolyModLoader.getMod("pdip").playerName = fL(this, hL, "f").nickname;ActivePolyModLoader.getMod("pdip").tokenHash = fL(this, hL, "f").tokenHash;');
@@ -760,18 +761,26 @@ class pdipMod extends PolyMod {
     const modInst = ActivePolyModLoader.getMod("pdip");
     if (modInst.polyDipEnabled) {
         modInst.removePolyDipUI();
-        modInst.setGreenStorage(ActivePolyModLoader.getMod("pdip").tokenHash);
+
+        localStorage.setItem(\`pdip_timer_\${modInst.tokenHash}\`, modInst.timeLength);
+        
         window.addEventListener("beforeunload", () => {
-                modInst.setGreenStorage(modInst.tokenHash);
-                if(modInst.pbHeight >= modInst.floorHeights[1] && modInst.latestServerPB !== modInst.pbHeight) {
-                    const data = JSON.stringify({
-                        userid: modInst.tokenHash,
-                        username: modInst.playerName,
-                        height: modInst.pbHeight
-                    });
-                    navigator.sendBeacon("https://polydip.orangy.cfd/updatepb", new Blob([data], { type: "application/json" }));
-                }
-        }};`);
+
+            localStorage.setItem(\`pdip_timer_\${modInst.tokenHash}\`, modInst.timeLength);
+
+            
+            if(modInst.pbHeight >= modInst.floorHeights[1] && modInst.latestServerPB !== modInst.pbHeight) {
+                const data = JSON.stringify({
+                    userid: modInst.tokenHash,
+                    username: modInst.playerName,
+                    height: modInst.pbHeight
+                });
+                navigator.sendBeacon("https://polydip.orangy.cfd/updatepb", new Blob([data], { type: "application/json" }));
+            }
+        })
+    }`);
+      
+    }
     update = function() {
         if (this.polyDipEnabled) {
                 if(this.car) {
@@ -783,7 +792,6 @@ class pdipMod extends PolyMod {
         }
     }
     postInit = () => {
-        this.timeLength = this.getGreenStorage() ?? 0;
         if(this.tokenHash !== "0") {
             this.pbFromServer(this.tokenHash).then((r) => {
                 if(r.error) {
