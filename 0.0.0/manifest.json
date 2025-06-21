@@ -5,7 +5,7 @@
         "author": "DoraChad + Orangy",
         "targets": ["0.5.0"],
         "main": "main.mod.js",
-        "locked": "true"
+        "locked": true
     },
     "dependencies": []
 }
