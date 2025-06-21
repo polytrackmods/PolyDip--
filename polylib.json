@@ -1,6 +1,11 @@
 {
   "changelogs": {
-    "0.0.1": "Fixed floor popup bug (one floor ahead)<br>Fixed green timer stopping when hiding ui/in freecam<br>Made green timer grey when stopped<br>Reseting timer actually shows on the ui"
+    "0.0.1": [
+      "Fixed floor popup bug (one floor ahead)",
+      "Fixed green timer stopping when hiding ui/in freecam",
+      "Made green timer grey when stopped",
+      "Reseting timer actually shows on the ui"
+    ]
   },
   "shortdesc": "Adds custom UI to the game for the Poly Dip 2 event."
 }
