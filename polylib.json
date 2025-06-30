@@ -5,6 +5,9 @@
       "Fixed green timer stopping when hiding ui/in freecam",
       "Made green timer grey when stopped",
       "Reseting timer actually shows on the ui"
+    ],
+    "0.0.2": [
+      "Change servers from Orangy to Ireozar"
     ]
   },
   "shortdesc": "Adds custom UI to the game for the Poly Dip 2 event."
