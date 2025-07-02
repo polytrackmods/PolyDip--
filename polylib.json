@@ -7,7 +7,7 @@
       "Reseting timer actually shows on the ui"
     ],
     "0.0.2": [
-      "Change servers from Orangy to Ireozar"
+      "Change servers from Orangy to Ireozar (fix request json keys)"
     ]
   },
   "shortdesc": "Adds custom UI to the game for the Poly Dip 2 event."
