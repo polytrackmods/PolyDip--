@@ -788,9 +788,9 @@ class pdipMod extends PolyMod {
                     console.log("No PB for user, skipping...")
                     this.latestServerPB = 0;
                 } else {
-                    console.log(`Got PB of ${r.pb} for user ${this.tokenHash}.`)
-                    this.latestServerPB = parseInt(r.pb)
-                    this.pbHeight = parseInt(r.pb)
+                    console.log(`Got PB of ${r.height} for user ${this.tokenHash}.`)
+                    this.latestServerPB = parseInt(r.height)
+                    this.pbHeight = parseInt(r.height)
                 }
             });
             this.fetchWR().then((b) => {
