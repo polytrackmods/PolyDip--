@@ -8,6 +8,9 @@
     ],
     "0.0.2": [
       "Change servers from Orangy to Ireozar (fix request json keys)"
+    ],
+    "0.0.2": [
+      "Updated mod to PolyTrack version 0.5.1"
     ]
   },
   "shortdesc": "Adds custom UI to the game for the Poly Dip 2 event."
